@@ -1,4 +1,4 @@
-# ANKH js
+# ANKH for Web
 
 a recreation of the 1980's AppleIIe prerelease of the game "ANKH" (by David VanBrink published by Datamost).  
 
