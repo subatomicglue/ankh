@@ -3,7 +3,7 @@
 a recreation of the 1980's AppleIIe prerelease of the game "[ANKH](http://dvb.omino.com/dvb/software/ankh/index.html)" (by [David VanBrink](http://metareal.net/) published by [Datamost](https://en.wikipedia.org/wiki/Datamost).  
 
  * [.. back one directory](../../..) 
-   * [ANKH for web](../Web) - circa 2018 ish...
+   * [ANKH for Web](../Web) - circa 2018 ish...
 
 why recreate the prerelease?  it's the one I played, know well, and love.
 
