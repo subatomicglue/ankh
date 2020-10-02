@@ -1,0 +1,53 @@
+[BUGS]
+CRASH in room 8,7 when infinite feedback off bullets between 2 redirectors, crashes in pixel out of bounds access in BitmapAsset, wtf
+
+in room where we use the crown/trap to shoot the face, trap gets stuck on wall sometimes
+
+
+[PUZZLES/GAMEPLAY]
+DONE fix bad guys going off edge of screen
+DONE fix badguys motion, tune shooting
+DONE fix bad guys can shoot each other
+DONE implement sucks! (rush to player and cling until shot, then reset)
+DONE implement map room graphics
+implement collision in map room
+implement spring behavior for lock thingie in room 8,7
+chalice??  what do i do with it
+implement death
+implement end of game
+
+
+
+[ENGINE]
+DONE  pixel perfect actor/actor collision
+DONE  pixel perfect box/actor collision
+implement sound
+implement FX for explosions, badguys, candies, treasures.
+pixel perfect ray/actor collision
+clean up map room stuff in background.h somhow...
+
+
+
+[AUTHENTICITY/POLISH]
+verify all doors match real game in 6,8 (lots of doors room)
+verify the trap-room controls all match...
+
+finalize karma points in assets.dat (compare to real game)
+
+implement clock in the right-hand UI.  study real game to see how it works...
+
+consider appending instruction text to front end UI
+or... press select in the front end ui to show the instructions?
+
+implement high score (can we save it in a save game slot?)  how to display it?
+
+polish:  nubs go away on the other when touch goes out...
+polish:  on drop, the touch beam doesn't extend as far as when it picked up...
+         especially when it penetrated inside the bbox to pickup...
+polish:  implement a step pad?  pad to change the step increment of the player..
+         or.. do something smart with timers. bigger step if pressed faster
+         or.. study real game, and do what it's doing.!!! :)
+
+
+
+

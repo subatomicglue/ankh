@@ -1,0 +1,156 @@
+ANKH
+by David Van Brink, published by Datamost 1984
+
+64 Rooms: An Adventure in the MetaReal World
+
+I am Ankh.  The ultimate puzzle.  I am under your control.  I obey all 
+commands.  Do with me what you will.  Travel through my MetaReal World 
+and you will unlock many secrets.  Many reflections of reflections.  But 
+be warned--my puzzles are not easy.  Many months may pass before you 
+solve all my puzzles and reach the last room.  To be successful, you 
+will have to stretch your powers to the limit.  Remember--there are 64 
+rooms...and only one solution.
+
+To move OtherUp -I
+Left -J
+Down -K
+Right -L
+To stop Otherspace bar
+
+To FireUp -E
+Left -S
+Down -D
+Right -F
+
+To Touch orUp -Ctrl E
+take ObjectLeft -Ctrl S
+Down -Ctrl D
+Right - Ctrl F
+
+To Set Object Down press number key 1,2,3, or 4
+To Rest press <ESC>
+
+Press V to control volume
+
+Choose.  The path to enlightenment takes many directions.  Discoveries 
+can be made by simply experimenting with various possibilities.  The 
+MetaReal World lies with the East Wind.
+
+Take control of your Other
+Open the first door to begin the journey
+The object is to solve puzzles, open doors and travel through all
+64 rooms
+
+The puzzles may be solved by a combination of logic, destruction, and 
+the scientific method.
+
+Watch your Karma!  Karma is the green or white line to the right of the 
+Ankh Field.  Your Other loses Karma by rubbing walls or objects.  Your 
+Other gaines Karma by entering new rooms and touching or shooting 
+objects.
+
+The rooms are divided into like-behaviour.  Be aware of the background.
+
+Listen to sounds!  When your Other touches or shoots an object, and you 
+hear a sound, you have triggered an action in another room.
+
+You may pick up as many as four objects, storing them in the boxes at 
+the top right-hand corner of the game screen.  These may come in handy 
+later in other rooms.  To set an object down, press the appropriate 
+number key.
+
+Any objects picked up will be set down in the same direction and at the 
+same distance.  Many objects may be carried to any room.
+
+X’s - Objects to shoot (bad)
+triangles - Objects to get (good)
+squares - Objects to use (functional)
+
+Score = Rooms + Objects + Bonus
+
+The triangles are a key to solving the final mystery.
+
+Amen-Ra leaves you with one clue:
+
+Sound on pitch creates ideas and emotion
+Sequence your hearing to cross Ankh’s ocean
+
+HINTS
+
+A short guided tour through the MetaReal world of Ankh
+
+1.  Insert Ankh into your computer’s drive and turn on your computer.
+2.  When the ‘choose’ screen appears, press the <Return> key.
+3.  The title screen will appear, followed by other assorted MetaReal 
+information.  Feel free to experiment with this information for a few 
+minutes.
+4.  Press the space bar to enter the MetaReal World of Ankh.
+5.  You are now in the first room.  The object in the center of the room 
+is your surrogate ‘Other’, which you will guide through all 64 rooms.
+6.  To open the first door (thereby solving the first puzzle), move your 
+Other down so it is in line with the small rectangle just above the 
+door.  Fire to the right and shoot the rectangle.  The door opens!
+7.  Move your Other down to the second room.  Since X’s are ‘bad’ and 
+are the things to shoot, move around the room and fire at the X.  When 
+you hit it, the X will explode and you will receive extra karma (the 
+line to the right of the Ankh playing field.
+8.  Move down to the third room, where you will see two X’s.  As in room 
+two, move around the room and fire at the Xs.  You may also choose to 
+avoid the Xs altogether by moving quickly down to the 4th room.  The Xs 
+will rob you of karma if they touch you, so try to keep moving.  If you 
+should run out of karma and die, press the space bar to start over.
+9.  Room four gives you a choice of two paths.  For this tutorial choose 
+the path which leads to the right.
+10.  After you enter the new room, shoot the Xs.  When finished, 
+continue moving right into the next room.
+11.  Notice the background in this new room.  Now move right into the 
+adjoining room.  Notice the background is similar.  The rooms are 
+divided into like-behavior, so these two rooms are solved together to 
+open the door on the right, leading to more rooms.
+12.  Move your Other to the right, then up into the top right-hand 
+corner until you are in line with the small rectangle in the lower 
+right-hand corner.
+13.  Shoot down at the rectangle.  The door opens.
+14.  Move left until you are directly below the small rectangle near the 
+center of the path.
+15.  Touch the rectangle.  Notice the sound.  This means you have 
+activated a trigger in another room.
+16.  Move left into the adjoining room and you will see a door open (the 
+result of touching the rectangle).
+17.  Move left until you are below the top left-hand rectangle and 
+inline with the rectangle on the right side of the room.
+18.  Shoot the right rectangle, then quickly move up into the top left-
+hand corner before the door closes on you.
+19.  Move right until you are directly below the rectangle near the 
+center of the path.
+20.  Touch the rectangle.  As before, you will hear a sound, meaning you 
+have activated a trigger in another room.
+21.  Move right into the adjoining room, then continue moving right 
+until you are above the lower right-hand rectangle and in line with the 
+rectangle on the left side of the room.
+22.  Shoot the rectangle on the left, then quickly move down into the 
+lower right-hand corner before the door closes on you.
+23.  Move left until you are directly above the rectangle near the 
+center of the path.
+24.  Shoot down at the rectangle.
+25.  Move left into the adjoining room until you are below the top left-
+hand door and in line with the rectangle on the right side of the 
+screen.
+26.  Shoot the rectangle on the right to open the top left-hand door, 
+then move down into the lower left-hand corner, keeping in line with the 
+top left-hand rectangle.
+27.  Shoot up into the top left-hand rectangle.
+28.  After the door opens, move right until you are directly below the 
+rectangle near the center of the path.
+29.  Shoot up into the rectangle.
+30.  Move right into the adjoining room and voila!--the door to the 
+right opens.  Now you are free to explore more rooms in the MetaReal 
+World.  The puzzles are all different, but work in much the same manner 
+as the puzzles you have solved so far.  Remember, the puzzles are solved 
+through a combination of logic, destruction and the scientific method.
+31.  Good luck.  May Amen-Ra guide your way.
+
+
+
+
+

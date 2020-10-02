@@ -1,0 +1,17 @@
+{
+  "name": "ankhjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "open http://localhost:8080; ./node_modules/.bin/http-server",
+    "reinstall": "npm run clobber; npm install",
+    "clobber": "rm -rf node_modules"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "http-server": "^0.11.1"
+  }
+}

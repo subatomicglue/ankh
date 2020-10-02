@@ -1,0 +1,5 @@
+
+all:
+	g++ -I .. -I glew-1.10.0/include main.cpp
+
+

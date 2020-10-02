@@ -1,0 +1,76 @@
+ANKH
+by David Van Brink, published by Datamost 1984
+
+64 Rooms: An Adventure in the MetaReal World
+
+I am Ankh.  The ultimate puzzle.  I am under your control.  I obey all 
+commands.  Do with me what you will.  Travel through my MetaReal World 
+and you will unlock many secrets.  Many reflections of reflections.  But 
+be warned--my puzzles are not easy.  Many months may pass before you 
+solve all my puzzles and reach the last room.  To be successful, you 
+will have to stretch your powers to the limit.  Remember--there are 64 
+rooms...and only one solution.
+
+To move Other	Up -		I	
+			Left -	J		
+			Down -	K	
+			Right -	L
+To stop Other	space bar
+
+To Fire		Up -		E
+			Left -	S
+			Down -	D
+			Right -	F
+
+To Touch or		Up -		Ctrl E
+take Object		Left -	Ctrl S
+			Down -	Ctrl D
+			Right - 	Ctrl F
+
+To Set Object Down press number key 1,2,3, or 4
+To Rest press <ESC>
+
+Press V to control volume
+
+Choose.  The path to enlightenment takes many directions.  Discoveries 
+can be made by simply experimenting with various possibilities.  The 
+MetaReal World lies with the East Wind.
+
+	Take control of your Other
+	Open the first door to begin the journey
+	The object is to solve puzzles, open doors and travel through all
+		64 rooms
+
+The puzzles may be solved by a combination of logic, destruction, and 
+the scientific method.
+
+Watch your Karma!  Karma is the green or white line to the right of the 
+Ankh Field.  Your Other loses Karma by rubbing walls or objects.  Your 
+Other gaines Karma by entering new rooms and touching or shooting 
+objects.
+
+The rooms are divided into like-behaviour.  Be aware of the background.
+
+Listen to sounds!  When your Other touches or shoots an object, and you 
+hear a sound, you have triggered an action in another room.
+
+You may pick up as many as four objects, storing them in the boxes at 
+the top right-hand corner of the game screen.  These may come in handy 
+later in other rooms.  To set an object down, press the appropriate 
+number key.
+
+Any objects picked up will be set down in the same direction and at the 
+same distance.  Many objects may be carried to any room.
+
+Xís - Objects to shoot (bad)
+triangles - Objects to get (good)
+squares - Objects to use (functional)
+
+Score = Rooms + Objects + Bonus
+
+The triangles are a key to solving the final mystery.
+
+Amen-Ra leaves you with one clue:
+
+	Sound on pitch creates ideas and emotion
+	Sequence your hearing to cross Ankhís ocean

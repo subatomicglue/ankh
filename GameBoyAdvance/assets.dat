@@ -1,0 +1,504 @@
+
+// palette name = { data }
+palette sprite_Palette;
+palette walls_Palette;
+palette title_Palette;
+
+// bitmap "name" tilesx tilesy pixelsx pixelsy "data"
+bitmap title1 = { 1, 1, 240, 160, title1_Bitmap, title_Palette };
+bitmap title2 = { 1, 1, 240, 160, title2_Bitmap, title_Palette };
+bitmap title3 = { 1, 1, 240, 160, title3_Bitmap, title_Palette };
+bitmap title4 = { 1, 1, 240, 160, title4_Bitmap, title_Palette };
+bitmap title5 = { 1, 1, 240, 160, title5_Bitmap, title_Palette };
+bitmap title6 = { 1, 1, 240, 160, title6_Bitmap, title_Palette };
+bitmap title7 = { 1, 1, 240, 160, title7_Bitmap, title_Palette };
+bitmap title8 = { 1, 1, 240, 160, title8_Bitmap, title_Palette };
+bitmap title9 = { 1, 1, 240, 160, title9_Bitmap, title_Palette };
+
+// uiscreens.  1st param == next screen, 2nd param == bitmap
+uiscreen title9_ui = { title9, title2_ui };
+uiscreen title8_ui = { title8, title9_ui };
+uiscreen title7_ui = { title7, title8_ui };
+uiscreen title6_ui = { title6, title7_ui };
+uiscreen title5_ui = { title5, title6_ui };
+uiscreen title4_ui = { title4, title5_ui };
+uiscreen title3_ui = { title3, title4_ui };
+uiscreen title2_ui = { title2, title3_ui };
+uiscreen title1_ui = { title1, title2_ui };
+
+bitmap badguy = { 1, 1, 8, 8, badguy_Bitmap, sprite_Palette };
+bitmap benign = { 1, 2, 16, 16, benign_Bitmap, sprite_Palette };
+bitmap bonus = { 1, 1, 16, 16, bonus_Bitmap, sprite_Palette };
+bitmap box = { 1, 1, 16, 16, box_Bitmap, sprite_Palette };
+bitmap chalice = { 1, 1, 16, 16, chalice_Bitmap, sprite_Palette };
+bitmap crown = { 1, 1, 32, 32, crown_Bitmap, sprite_Palette };
+bitmap flit = { 1, 1, 16, 16, flit_Bitmap, sprite_Palette };
+bitmap horzdoor = { 1, 1, 32, 32, horzdoor_Bitmap, sprite_Palette };
+bitmap illumina = { 1, 1, 16, 16, illumina_Bitmap, sprite_Palette };
+bitmap item = { 1, 1, 8, 8, item_Bitmap, sprite_Palette };
+bitmap key = { 1, 2, 16, 8, key_Bitmap, sprite_Palette };  // this seems to work... ? (i thought it should be square)
+bitmap lock = { 1, 1, 8, 8, lock_Bitmap, sprite_Palette };
+bitmap lockface = { 1, 1, 16, 16, lockface_Bitmap, sprite_Palette };
+bitmap musicbox = { 1, 1, 32, 32, musicbox_Bitmap, sprite_Palette };
+bitmap other = { 1, 1, 32, 32, other_Bitmap, sprite_Palette };
+bitmap suck = { 1, 1, 32, 32, suck_Bitmap, sprite_Palette };
+bitmap tele = { 1, 1, 16, 16, tele_Bitmap, sprite_Palette };
+bitmap trap = { 1, 1, 16, 16, trap_Bitmap, sprite_Palette };
+bitmap treasure = { 1, 1, 32, 32, treasure_Bitmap, sprite_Palette };
+bitmap vertdoor = { 1, 1, 32, 32, vertdoor_Bitmap, sprite_Palette };
+bitmap locklisten = { 1, 2, 16, 8, locklisten_Bitmap, sprite_Palette };
+bitmap bullet = { 1, 1, 8, 8, bullet_Bitmap, sprite_Palette };
+bitmap touchvert = { 1, 1, 16, 16, touchvert_Bitmap, sprite_Palette };
+bitmap touchhorz = { 1, 1, 16, 16, touchhorz_Bitmap, sprite_Palette };
+//bitmap monster = { 1, 12, 16, 16, 16, 192, monster_Bitmap, sprite_Palette };
+
+// map "name" = { tilesx, tilesy, "data" }
+map wallsMap = { 96 * 2, 96 * 2, walls_Map };
+map hudMap = { 32, 32, hud_Map };
+
+// 32 tiles across,  8 pixels per tile.
+bitmap  wallsBitmap = { 32, 32, 8, 8, walls_Bitmap, walls_Palette };
+bitmap  hudBitmap   = { 32, 32, 8, 8, hud_Bitmap, walls_Palette };
+
+bitmap  quake3 = { 1, 1, 256, 256, quake3_Bitmap, sprite_Palette };
+
+bitmap  nobitmap = { 1, 1, 8, 8, nobitmap_Bitmap, sprite_Palette };
+
+// sprites, 2d geometry, simply a textured quad.  width, height, bitmap
+sprite badguy = { 6, 3, badguy };
+sprite benign = { 15, 7, benign };
+sprite bonus = { 13, 7, bonus };
+sprite box = { 9, 7, box };
+sprite chalice = { 11, 5, chalice };
+sprite crown = { 19, 4, crown };
+sprite flit = { 13, 5, flit };
+sprite horzdoor = { 30, 4, horzdoor };
+sprite illumina = { 11, 6, illumina };
+sprite item = { 6, 3, item };
+sprite key = { 16, 8, key };
+sprite lock = { 8, 5, lock };
+sprite lockface = { 14, 6, lockface };
+sprite musicbox = { 20, 7, musicbox };
+sprite other = { 21, 13, other };
+sprite suck = { 23, 5, suck };
+sprite tele = { 9, 5, tele };
+sprite trap = { 11, 5, trap};
+sprite treasure = { 17, 6, treasure };
+sprite vertdoor = { 6, 32, vertdoor };
+sprite locklisten = { 16, 8, locklisten };
+sprite bullet = { 2, 1, bullet };
+sprite touchvert = { 2, 16, touchvert };
+sprite touchhorz = { 16, 2, touchhorz };
+
+
+// actor "name" = { "type", "sprite", posx, posy, karmapoints,shootpoints, {'type' params} }
+// NOTE: actor name is name<roomx><roomy><uniquenumber>
+
+// DATATYPES:
+// actor { "type", "sprite", posx, posy }
+// ankhactor { karmapoints, shootpoints, canpickup }
+// badguy {} // creature that shoots at you.
+// benign {} // creature with normal object attrs, can't be killed.
+// bonus {value} // gives points
+// redirect {directionx, directiony} // shoots when shot
+// chalice {} // ?
+// triggeritem {triggername, when} // triggers another item when touched or shot, pickedup, dropped, collided.
+// flit {} // makes time slow
+// door {velocity} // moves when triggered
+// illumina {} // draw enables all treasure
+// item {} // does nothing
+// key {triggername}  // triggers something when dropped near it.
+// musicbox {song}
+// player {power}
+// suck {amount} // flocks to player, sucks some amount from when touching.
+// tele {where} // when triggered, moves player to a location
+// trap {shotdir} // shoots when triggered
+// mover {item, direction} // causes item to move in some direction.
+// treasure {value}
+// listentrigger {{items}, distance, triggername} // listens for triggers from items in order, triggers another item.
+// osc {dir} // moves something along dir, when collide, reverse dir.
+// shooter {dir} // shoots when triggered
+// shooter2 {} // shoots randomly when turned on (trigger toggles).
+
+actor player = { player, other, 6.375, 6.5,			-4, -4 };
+actor bullet000 = { none, bullet, 6, 6.6, 4, 4, COLLISION | VISIBLE };
+actor bullet001 = { none, bullet, 6.1, 6.7, 4, 4, COLLISION | VISIBLE };
+actor bullet002 = { none, bullet, 6, 6.8, 4, 4, COLLISION | VISIBLE };
+actor bullet003 = { none, bullet, 6.1, 6.9, 4, 4, COLLISION | VISIBLE };
+actor bullet004 = { none, bullet, 6, 7, 4, 4, COLLISION | VISIBLE };
+actor bullet005 = { none, bullet, 6.1, 7.1, 4, 4, COLLISION | VISIBLE };
+actor bullet006 = { none, bullet, 6, 7.2, 4, 4, COLLISION | VISIBLE };
+actor bullet007 = { none, bullet, 6.1, 7.3, 4, 4, COLLISION | VISIBLE };
+actor bullet008 = { none, bullet, 6, 7, 4, 4, COLLISION | VISIBLE };
+actor bullet009 = { none, bullet, 6.1, 7.1, 4, 4, COLLISION | VISIBLE };
+actor bullet010 = { none, bullet, 6, 7.2, 4, 4, COLLISION | VISIBLE };
+actor bullet011 = { none, bullet, 6.1, 7.3, 4, 4, COLLISION | VISIBLE };
+actor touchvert000 = { none, touchvert, 5, 6.625, 4, 4, COLLISION | VISIBLE }; 
+actor touchhorz000 = { none, touchhorz, 5.5, 6.625, 4, 4, COLLISION | VISIBLE };
+actor touchvert001 = { none, touchvert, 5, 6.625, 4, 4, COLLISION | VISIBLE }; 
+actor touchhorz001 = { none, touchhorz, 5.5, 6.625, 4, 4, COLLISION | VISIBLE };
+
+
+// room 0,0
+actor candy000 = { candy, item, 5, 3.375,			4, 4 };
+actor candy001 = { candy, item, 7.625, 4.625,		4, 4 };
+actor candy002 = { osc( -1, -1 ), item, 7.75, 6,	4, 4 };
+actor door000 = { horzdoor, horzdoor, 6, 11,		4, 4 };
+actor musicbox000 = { musicbox( piano461, BehaviourMethod::UP, BehaviourMethod::SHOOT ), musicbox, 3, 6.625, 4, 4 };
+actor doorlock000 = { doorlock( door000 ), lockface, 9, 9.25, 4, 4 };
+actor treasure000 = { treasure( 10 ), treasure, 6.5, 3.375, 4, 4 };
+
+
+
+// room 0,1
+actor enemy010 = { badguy, badguy, 7, 7, 4, 4 };
+
+// room 0,2
+actor enemy020 = { badguy, badguy, 5, 3.375, 4, 4 };
+actor enemy021 = { badguy, badguy, 11, 6, 4, 4 };
+
+// room 0,3
+actor treasure030 = { treasure( 10 ), treasure, 4, 9.5, 4, 4 };
+actor treasure031 = { treasure( 10 ), treasure, 8.875, 9.5, 4, 4 };
+
+// room 0,4
+actor doorlock040 = { doorlock( door040 ), lock, 9.25, 5.375, 4, 4 };
+actor doorlock041 = { doorlock( door041 ), lock, 5.25, 9.375, 4, 4 };
+actor door040 = { vertdoor, vertdoor, 9, 6, 4, 4 };
+actor door041 = { horzdoor, horzdoor, 6, 9, 4, 4 };
+
+// room 0,5 nothing...
+
+// room 0,6
+actor doorlock060 = { doorlock, lockface, 8, 9.25, 4, 4 };
+actor door060 = { vertdoor, vertdoor, 5.625, 5, 4, 4 };
+actor doorlock061 = { doorlock( door160 ), item, 4.625, 5.875, 4, 4 };
+
+// room 0,7 nothing.  end!
+
+
+
+
+// room 1,0
+actor benign100 = { benign, benign, 6.5, 6.75, 4, 4 };
+
+// room 1,1
+
+// room 1,2
+actor candy120 = { candy, item, 2.125, 11.5, 4, 4 };
+
+// room 1,3
+actor doorlock130 = { doorlock( door130 ), lock, 3.25, 3.375, 4, 4 };
+actor door130 = { horzdoor, horzdoor, 6, 2.75, 4, 4 };
+actor enemy130 = { badguy, badguy, 9.125, 5.25, 4, 4 };
+actor enemy131 = { badguy, badguy, 7, 8, 4, 4 };
+
+// room 1,4
+actor door140 = { horzdoor, horzdoor, 6, 8, 4, 4 };
+actor musicbox140 = { musicbox( piano461, BehaviourMethod::LEFT, BehaviourMethod::SHOOT ), musicbox, 6.5, 10.375, 4, 4 };
+
+// room 1,5
+actor doorlock150 = { doorlock, lockface, 7, 5.25, 4, 4 };
+actor door150 = { vertdoor, vertdoor, 5.625, 8, 4, 4 };
+actor doorlock151 = { doorlock(door060), item, 4.625, 8.875, 4, 4 };
+actor enemy150 = { badguy, badguy, 10.375, 3.625, 4, 4 };
+
+// room 1,6
+actor doorlock160 = { doorlock, lockface, 5.125, 2.25, 4, 4 };
+actor door160 = { horzdoor, horzdoor, 4, 9, 4, 4 };
+actor doorlock161 = { doorlock(door260), item, 4.875, 10, 4, 4 };
+
+// room 1,7
+
+
+
+
+// room 2,0
+actor crown200 = { trigger( trap200, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), crown, 6.375, 3.25, 4, 4 };
+actor trap200 = { trap( 0,-2,-1 ), trap, 6.625, 9.75, 4, 4 };
+
+// room 2,1
+actor teleswitch210 = { doorlock, tele, 2.25, 10.25, 4, 4 };
+actor teleport210 = { tele, badguy, 10.25, 10.375, 4, 4 };
+
+// room 2,2
+actor lock220 = { trigger( trap200, BehaviourMethod::UP,    BehaviourMethod::TOUCH ), item, 5.375, 8.25, 4, 4 };
+actor lock221 = { trigger( trap200, BehaviourMethod::DOWN,  BehaviourMethod::TOUCH ), item, 8.375, 5.5, 4, 4 };
+actor lock222 = { trigger( trap200, BehaviourMethod::LEFT,  BehaviourMethod::TOUCH ), item, 9.25, 8.125, 4, 4 };
+actor lock223 = { trigger( trap200, BehaviourMethod::RIGHT, BehaviourMethod::TOUCH ), item, 3.375, 5.5, 4, 4 };
+actor face220 = { doorlock( door320 ), lockface, 11.125, 9.125, 4, 4 };
+
+// room 2,3
+actor enemy230 = { badguy, badguy, 8.25, 4, 4, 4 };
+actor enemy231 = { badguy, badguy, 4.125, 4.75, 4, 4 };
+
+// room 2,4
+actor doorlock240 = { doorlock, lockface, 2, 8.25,				4, 4 };
+actor door240 = { horzdoor, horzdoor, 6, 5.75,					4, 4 };
+actor doorlock241 = { doorlock(door360), item, 6.75, 4.875,		4, 4 };
+
+// room 2,5
+actor doorlock250 = { doorlock(door350), lockface, 8, 8.25,		4, 4 };
+actor door250 = { horzdoor, horzdoor, 4, 5.75,					4, 4 };
+actor key251 = { key(door140), key, 4.625, 4.625,				4, 4 };
+
+// room 2,6
+actor doorlock260 = { doorlock, lockface, 11, 8.25,				4, 4 };
+actor door260 = { vertdoor, vertdoor, 5.625, 3.875,				4, 4 };
+actor doorlock261 = { doorlock(door240), item, 4.625, 4.875,	4, 4 };
+
+// room 2,7
+
+
+
+// room 3,0
+actor shooter300 = { shooter( 1,0, 60 ), box, 2.5, 3.25,        4,4 };
+actor leftdoor300 = { vertdoor, vertdoor, 4.25, 2.5,            4,4 };
+actor rightdoor300 = { vertdoor, vertdoor, 9.25, 2.5,           4,4 };
+actor face300 = { doorlock( entrydoor300 ), lockface, 10.75, 3.25, 4, 4 };
+actor musicbox301 = { musicbox( piano461, BehaviourMethod::DOWN, BehaviourMethod::SHOOT ), musicbox, 6.75, 7,              4,4 };
+actor entrydoor300 = { horzdoor, horzdoor, 6, 11,               4,4 };
+actor lock300 = { doorlock( leftdoor300 ), item, 2.625, 6,      4,4 };
+actor lock301 = { doorlock( rightdoor300 ), item, 11.375, 6,    4,4 };
+//sprite panpad300 = { 48, 33, nobitmap };
+//sprite panpad301 = { 48, 33, nobitmap };
+//sprite panpad302 = { 702 - 639, 190 - 79, nobitmap };
+//actor panpad300 = { panpad( 60,0 ), panpad300, 575px, 79px,   0, 0, COLLISION_TRIGGER };
+//actor panpad301 = { panpad( -60, 0 ), panpad301, 719px, 79px, 0, 0, COLLISION_TRIGGER };
+//actor panpad302 = { interppad( 0,0, 0,-70), panpad302, 639px, 79px, 0, 0, COLLISION_TRIGGER };
+
+// room 3,1
+actor treasure310 = { treasure( 10 ), treasure, 6.5, 6.75, 4, 4 };
+
+// room 3,2
+actor treasure320 = { treasure( 10 ), treasure, 10.75, 9.125, 4, 4 };
+actor benign320 = { benign( 2, 0 ), benign, 8.125, 10, 4, 4 };
+actor benign321 = { benign( 2, 0 ), benign, 4.25, 9.375, 4, 4 };
+actor door320 = { horzdoor, horzdoor, 6, 8.75, 4, 4 };
+actor illumina320 = { illumina( ActorInit::treasure ), illumina, 2, 11.5, 4, 4 };
+
+// room 3,3
+actor enemy330 = { badguy, badguy, 5.375, 3.75, 4, 4 };
+actor enemy331 = { badguy, badguy, 9.375, 3.125, 4, 4 };
+actor enemy332 = { badguy, badguy, 8.25, 10.25, 4, 4 };
+
+// room 3,4
+actor doorlock340 = { doorlock, lockface, 8, 8.25, 4, 4 };
+actor door340 = { horzdoor, horzdoor, 4, 5.75, 4, 4 };
+actor doorlock341 = { doorlock( door250 ), item, 4.875, 4.875, 4, 4 };
+
+// room 3,5
+actor doorlock350 = { doorlock, lockface, 5, 4.25, 4, 4 };
+actor door350 = { vertdoor, vertdoor, 5.625, 5.875, 4, 4 };
+actor doorlock351 = { doorlock(door150), item, 4.75, 6.875, 4, 4 };
+
+// room 3,6
+actor doorlock360 = { doorlock, lockface, 3, 5.25, 4, 4 };
+actor door360 = { vertdoor, vertdoor, 7.875, 3.875, 4, 4 };
+actor doorlock361 = { doorlock( door340 ), item, 8.75, 4.875, 4, 4 };
+
+// room 3,7
+
+
+
+// room 4,0
+actor suck400 = { suck(1, -4 /*damage*/), suck, 6.25, 11.5, 4, 4 };
+actor suck401 = { suck(-1, -4 /*damage*/), suck, 6.25, 2.125, 4, 4 };
+
+// room 4,1
+
+// room 4,2
+
+// room 4,3
+actor enemy430 = { badguy, badguy, 8.625, 9.625, 4, 4 };
+actor enemy431 = { badguy, badguy, 5.625, 9.5, 4, 4 };
+actor enemy432 = { badguy, badguy, 7, 8, 4, 4 };
+
+// room 4,4
+actor enemy440 = { badguy, badguy, 10.125, 10.375, 4, 4 };
+actor enemy441 = { badguy, badguy, 4.375, 2.375, 4, 4 };
+actor enemy442 = { badguy, badguy, 11.125, 5.125, 4, 4 };
+actor enemy443 = { badguy, badguy, 2.125, 4.25, 4, 4 };
+
+// room 4,5
+actor enemy450 = { badguy, badguy, 9.25, 11.125, 4, 4 };
+actor enemy451 = { badguy, badguy, 9.25, 2.25, 4, 4 };
+actor enemy452 = { badguy, badguy, 3.25, 3.25, 4, 4 };
+actor enemy453 = { badguy, badguy, 10.75, 4.125, 4, 4 };
+
+// room 4,6
+actor door460 = { horzdoor, horzdoor, 6, 10, 4, 4 };
+actor door461 = { horzdoor(false,-1), horzdoor, 6, 8, 4, 4 };
+actor doorlock460 = { tonegen, locklisten, 5, 7.25, 4, 4 };
+sprite piano461 = { 1, 1, nobitmap };
+actor piano461 = { statetrigger( door460, door461 ), piano461, 5, 7.25, 4, 4, COLLISION_TRIGGER };
+
+
+// room 4,7
+actor treasure470 = { treasure( 10 ), treasure, 9.875, 6.5, 4, 4 };
+actor treasure471 = { treasure( 10 ), treasure, 9.875, 6, 4, 4 };
+actor treasure472 = { treasure( 10 ), treasure, 9.875, 5.5, 4, 4 };
+
+
+
+
+// room 5,0
+actor enemy500 = { badguy, badguy, 7.25, 10.375, 4, 4 };
+actor enemy501 = { badguy, badguy, 7.25, 2.25, 4, 4 };
+
+// room 5,1
+
+// room 5,2
+
+// room 5,3
+
+// room 5,4
+actor up540 = { trigger( player540, BehaviourMethod::UP, BehaviourMethod::TOUCH ), item, 11.375, 10.75, 4, 4 };
+actor down541 = { trigger( player540, BehaviourMethod::DOWN, BehaviourMethod::TOUCH ), item, 9.125, 10.75, 4, 4 };
+actor stop542 = { trigger( player540, BehaviourMethod::STOP, BehaviourMethod::TOUCH ), item, 10.25, 11.625, 4, 4 };
+actor shoot543 = { trigger( player540, BehaviourMethod::SHOOT, BehaviourMethod::TOUCH ), item, 11.375, 10.375, 4, 4 };
+actor face544 = { doorlock( door650 ), lockface, 6.875, 6.75, 4, 4 };
+actor player540 = { playerdrone, other, 2, 2, 4, 4 };
+sprite triggerpad540 = { 1230 - 1152, 880 - 847, nobitmap };
+actor triggerpad540 = { triggerpad( player540, BehaviourMethod::EXIT ), triggerpad540, 1152px, 847px, 0, 0, COLLISION_TRIGGER };
+
+// room 5,5
+actor bonus550 = { candy, bonus, 7, 7.75, 4, 4 };
+actor down550 = { trigger( player550, BehaviourMethod::DOWN, BehaviourMethod::TOUCH ), item, 9, 10.75, 4, 4 };
+actor up551 = { trigger( player550, BehaviourMethod::UP, BehaviourMethod::TOUCH ), item, 11.5, 10.75, 4, 4 };
+actor shoot552 = { trigger( player550, BehaviourMethod::SHOOT, BehaviourMethod::TOUCH ), item, 11.5, 10.375, 4, 4 };
+actor face550 = { doorlock( door660 ), lockface, 6.875, 6.75, 4, 4 };
+actor player550 = { playerdrone, other, 2, 2.125, 4, 4 };
+sprite triggerpad550 = { 1230 - 1152, 1072 - 1039, nobitmap };
+actor triggerpad550 = { triggerpad( player550, BehaviourMethod::EXIT ), triggerpad550, 1152px, 1039px, 0, 0, COLLISION_TRIGGER };
+
+// room 5,6
+actor down560 = { trigger( player560, BehaviourMethod::DOWN, BehaviourMethod::TOUCH ), item, 9, 10.75, 4, 4 };
+actor shoot561 = { trigger( player560, BehaviourMethod::SHOOT, BehaviourMethod::TOUCH ), item, 11.5, 10.25, 4, 4 };
+actor face560 = { doorlock( door670 ), lockface, 6.875, 6.75, 4, 4 };
+actor player560 = { playerdrone, other, 2, 2, 4, 4 };
+sprite triggerpad560 = { 1230 - 1152, 1264 - 1231, nobitmap };
+actor triggerpad560 = { triggerpad( player560, BehaviourMethod::EXIT ), triggerpad560, 1152px, 1231px, 0, 0, COLLISION_TRIGGER };
+
+// room 5,7
+actor trigger570 = { doorlock( door570, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 11.5, 9.375, 4, 4 };
+actor trigger571 = { doorlock( door571, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 11.375, 10, 4, 4 };
+actor trigger572 = { doorlock( door572, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 11.5, 10.25, 4, 4 };
+actor trigger573 = { doorlock( door573, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 11.375, 10.625, 4, 4 };
+actor trigger574 = { doorlock( door574, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 10.25, 11.625, 4, 4 };
+actor trigger575 = { doorlock( door575, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 9.125, 10.5, 4, 4 };
+actor trigger576 = { doorlock( door576, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 9.25, 9.5, 4, 4 };
+actor trigger577 = { doorlock, item, 9, 9.25, 4, 4 };
+actor face570 = { doorlock( door671 ), lockface, 6.75, 6.75, 4, 4 };
+actor enemy570 = { badguy, badguy, 2.125, 2.125, 4, 4 };
+actor door570 = { vertdoor, vertdoor, 5.625, 6, 4, 4 };
+actor door571 = { vertdoor, vertdoor, 3.625, 2, 4, 4 };
+actor door572 = { vertdoor, vertdoor, 3.625, 6, 4, 4 };
+actor door573 = { vertdoor, vertdoor, 5.75, 2, 4, 4 };
+actor door574 = { horzdoor, horzdoor, 4, 4, 4, 4 };
+actor door575 = { horzdoor, horzdoor, 6, 5.875, 4, 4 };
+actor door576 = { horzdoor, horzdoor, 6, 7.875, 4, 4 };
+
+
+
+// room 6,0
+actor door600 = { vertdoor, vertdoor, 5.625, 5.875, 4, 4 };
+
+// room 6,1
+actor door610 = { horzdoor, horzdoor, 6, 5, 4, 4 };
+actor doorlock610 = { doorlock( door600 ), lockface, 3.125, 9.875, 4, 4 };
+actor musicbox610 = { musicbox( piano461, BehaviourMethod::RIGHT, BehaviourMethod::SHOOT ), musicbox, 3, 6.625, 4, 4 };
+sprite touchpad610 = { 93, 111, nobitmap };
+actor touchpad610 = { touchpad( 12 ), touchpad610, 1200px, 193px,   0, 0, COLLISION_TRIGGER };
+//1200,193   1293, 304
+
+// room 6,2
+actor door620 = { vertdoor(false,-1,64), vertdoor, 8.625, 1.875, 4, 4 };
+actor doorlock620 = { doorlock( door620 ), lockface, 2.875, 11.625, 4, 4 };
+actor key620 = { key( door610 ), key, 2.875, 7.125, 4, 4 };
+
+// room 6,3
+actor candy630 = { candy, item, 2.875, 5.25,	4, 8 };
+actor candy631 = { candy, item, 2, 5.5,			4, 8 };
+actor candy632 = { candy, item, 2, 5,			4, 8 };
+actor candy633 = { candy, item, 2.875, 5,		4, 8 };
+actor candy634 = { candy, item, 2.375, 5.5,		4, 8 };
+actor candy635 = { candy, item, 2, 5.25,		4, 8 };
+actor candy636 = { candy, item, 2.375, 5,		4, 8 };
+actor candy637 = { candy, item, 2.875, 5.5,		4, 8 };
+actor doorlock630 = { doorlock( door631 ), lock, 1.25, 8.375, 4, 4 };
+actor door630 = { vertdoor, vertdoor, 9, 6,		4, 4 };
+actor doorlock631 = { doorlock( door630 ), lock, 9.25, 8.25, 4, 4 };
+actor door631 = { horzdoor, horzdoor, 6, 9,		4, 4 };
+sprite panpad630 = { 1134 - 1086, 1519 - 1423, nobitmap };
+actor panpad630 = { interppad( -28,/*-*/ 0,   0,/*-*/ 0), panpad630, 1086px, 1423px, 0, 0, COLLISION_TRIGGER };
+
+
+// room 6,4
+
+// room 6,5
+actor enemy650 = { badguy, badguy, 3.75, 6.75, 4, 4 };
+actor enemy651 = { badguy, badguy, 8.375, 7.25, 4, 4 };
+actor door650 = { vertdoor, vertdoor, 5.625, 6, 4, 4 };
+actor door651 = { vertdoor, vertdoor, 8, 6, 4, 4 };
+
+// room 6,6
+actor enemy660 = { badguy, badguy, 3.75, 6.5, 4, 4 };
+actor enemy661 = { badguy, badguy, 9.75, 6.75, 4, 4 };
+actor door660 = { vertdoor, vertdoor, 5.625, 6, 4, 4 };
+actor door661 = { vertdoor, vertdoor, 8, 6, 4, 4 };
+
+
+// room 6,7
+actor enemy670 = { badguy, badguy, 2.75, 6.5, 4, 4 };
+actor enemy671 = { badguy, badguy, 9.25, 6.875, 4, 4 };
+actor door670 = { vertdoor, vertdoor, 5.625, 6, 4, 4 };
+actor door671 = { vertdoor, vertdoor, 8, 6, 4, 4 };
+
+
+
+
+
+// room 7,0
+
+// room 7,1
+actor redirect710 = { redirect( 0, -1 ), box, 6.625, 8.75, 4, 4 };
+actor redirect711 = { redirect( -1, 0 ), box, 6.625, 4.75, 4, 4 };
+actor shooter710 = { shooter( -1, 0, 15 ), badguy, 9.875, 8.875, 4, 4 };
+actor doorlock710 = { doorlock, badguy, 3.75, 4.875, 4, 4 };
+
+// room 7,2
+
+// room 7,3
+
+// room 7,4
+
+// room 7,5
+
+// room 7,6
+actor trigger760 = { trigger( door760, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 4.625, 11.75, 4, 4 };
+actor trigger761 = { trigger( randshooter760, BehaviourMethod::TRIGGER, BehaviourMethod::TOUCH ), item, 2.75, 4.125, 4, 4 };
+actor door760 = { horzdoor(false,-1), horzdoor, 5, 9.875, 4, 4 };
+actor doorlock760 = { doorlock( mover762 ), badguy, 7.25, 2.125, 4, 4 };
+actor randshooter760 = { shooter(0,-2,30,60,3,false), box, 7.25, 8, 4, 4 };
+actor redirect760 = { redirect(-1,0), box, 5.125, 7.375, 4, 4 };
+actor redirect761 = { redirect(1,0), box, 5.375, 4.125, 4, 4 };
+actor redirect762 = { redirect, box, 8.875, 9.125, 4, 4 };
+actor mover762 = { shooter( 0, 1, -1 ), trap, 11.125, 2.125, 4, 4 };
+
+// room 7,7
+actor door770 = { horzdoor, horzdoor, 10, 10, 4, 4 };
+actor door771 = { horzdoor, horzdoor, 10, 3.75, 4, 4 };
+actor door772 = { horzdoor, horzdoor, 5, 3.75, 4, 4 };
+actor enemy770 = { badguy, badguy, 6.875, 5, 4, 4 };
+actor enemy771 = { badguy, badguy, 8.25, 7.75, 4, 4 };
+actor trigger770 = { doorlock( door770 ), item, 9.625, 9.75, 4, 4 };
+actor trigger771 = { doorlock( door771 ), item, 9.625, 4, 4, 4 };
+actor trigger772 = { doorlock( door772 ), item, 4.5, 2, 4, 4 };
+actor chalice772 = { chalice, chalice, 10.75, 10.875, 4, 4 };
+actor face770 = { doorlock( door661 ), lockface, 10.5, 2.75, 4, 4 };
+actor flit770 = { flit, flit, 5.125, 8.75, 4, 4 };
+
+
+
+
