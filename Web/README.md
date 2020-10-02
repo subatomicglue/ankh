@@ -9,7 +9,7 @@ why recreate the prerelease?  it's the one I played, know well, and love.
 
 everything is recreated from screenshots and playing through the game
 
-*this is an omage:*  much respect and love for this game
+**this is an omage:**  much respect and love for this game
 
 # Status
 Work in progress, this is not very far along
