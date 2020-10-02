@@ -9,6 +9,8 @@ why recreate the prerelease?  it's the one I played, know well, and love.
 
 everything is recreated from screenshots and playing through the game
 
+*this is an omage:*  much respect and love for this game
+
 # Status
 I got about 90% of the game working on actual GBA hardware, playable.  But I think ran out of RAM and started getting lockup problems on hardware (worked great in the VirtualBoyAdvance emulator).   Life caught up and then Lost interest.
 
