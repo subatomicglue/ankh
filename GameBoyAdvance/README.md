@@ -21,7 +21,7 @@ To build the game, you'll need a GBA toolchain.
 
 How to do this is an exercise left to the reader.  Someday I might give more info.  But for now, experienced GBA developers will know what to do, and beginners will need to figure it out.
 
-Once you have built the `gba` file from source code, you can load the `gba` cartdrige image into an emulator like [VisualBoyAdvance](https://www.google.com/search?q=visualboyadvance&oq=visualboyadvance)
+Once you have built the `gba` file from source code, you can load into an emulator like [VisualBoyAdvance](https://www.google.com/search?q=visualboyadvance&oq=visualboyadvance)
 
 ## screenshots
 
