@@ -1,6 +1,6 @@
 # ANKH for Web
 
-a recreation of the 1980's AppleIIe prerelease of the game "ANKH" (by David VanBrink published by Datamost).  
+a recreation of the 1980's AppleIIe prerelease of the game "[ANKH](http://dvb.omino.com/dvb/software/ankh/index.html)" (by [David VanBrink](http://metareal.net/) published by [Datamost](https://en.wikipedia.org/wiki/Datamost).  
 
  * [.. back one directory](../../..) 
    * [ANKH for Game Boy Advance](../GameBoyAdvance) - done around 2004-2005 ish...
