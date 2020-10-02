@@ -1,45 +1,37 @@
-<html>
-   <title>spew - output debug trace logger for c++</title>
-</html>
-<body bgcolor="#222211" text="#ffffff"  link="#0090ff" alink="#0090ff"
-   vlink="#0090ff">
-<h2>spew</h2>
+# spew - output debug trace logger for c++
 
-<p>
 spew is a full featured output system for c++ programmers.
 
-<h3>features</h3>
-<ul>
-   <li> built-in outputs ready to go: <tt>Log, Trace, StdErr, StdOut</tt>
-   <li> category filters and levels for any output type
-   <li> filter configuration using included command line parsing utility
-   <li> can attach custom ostreams to any output
-   <li> cout (ostream) and printf syntax styles both supported
-   <li> <tt>Trace</tt> compiles away to nothing in release builds
-   <li> <tt>Trace</tt> outputs to the MSVC++ debugger output window
-   <li> <tt>Log</tt> outputs to the file <tt>log.txt</tt>
-   <li> easy to add in:  in-game consoles, unix, printf, other debuggers, etc...
-   <li> assert with assertion handler add in support.
-</ul>
+## features
+ * built-in outputs ready to go: `Log, Trace, StdErr, StdOut`
+ * category filters and levels for any output type
+ * filter configuration using included command line parsing utility
+ * can attach custom ostreams to any output
+ * cout (ostream) and printf syntax styles both supported
+ * `Trace` compiles away to nothing in release builds
+ * `Trace` outputs to the MSVC++ debugger output window
+ * `Log` outputs to the file `log.txt`
+ * easy to add in:  in-game consoles, unix, printf, other debuggers, etc...
+ * assert with assertion handler add in support.
 
-<h3>examples:</h3>
-<p> as seen in example 1 below, spew supports ostream ideas as well as
-printf ideas.  <BR>
+## examples:
+as seen in example 1 below, spew supports ostream ideas as well as
+printf ideas.
+
 filters are optional, and may be specified to move output
 to other channels as a way to control excess text spewage.
-<p>
-<table bgcolor="#555555"><tr><td><pre>
+
+```
 spew::Trace << "Trace] default filter, default level" << std::endl;
 spew::Trace( spew::IO ) << "Trace] IO filter, default level" << std::endl;
 spew::Trace( spew::SCRIPT, 4 ) << "Trace] SCRIPT filter, level 4" << std::endl;
 spew::Log( "Log] default '%s', default '%s'\n", "filter", "level" );
 spew::StdOut( spew::GFX, "StdOut] GFX filter, default '%s'\n", "level" );
 spew::StdErr( spew::SOUND, 3, "StdErr] SOUND filter, '%s' '%d'\n", "level", 3 );</pre></td></tr></table>
-<b>example 1. using spew. <tt>Trace</tt> will output to the msvc++ debugger
-   output window, or stdout in unix.</b><BR>
+```
+*example 1. using spew. `Trace` will output to the msvc++ debugger output window, or stdout in unix.*
 
-<p>
-<table bgcolor="#555555"><tr><td><pre>
+```
 spew::parseCommandLine( argc, argv ); // put this first thing in main(..)
 
 spew::Log.SetFilter( spew::GFX ); // can configure from c++ side also...
@@ -47,19 +39,11 @@ spew::Log.SetLevel( 3 ); // can configure from c++ side also...
 
 ::: syntax to pass command line args to spew
 &gt; myapp.exe -TraceOnGfx -TraceLevel4 -StderrOff -TraceOn
-</pre></td></tr></table>
-<b>example 2.  spew can self-configure using command line flags, or
-   manually using function calls</b><BR>
+```
+*example 2.  spew can self-configure using command line flags, or manually using function calls*
 
-
-
-<h3>download spew</h3>
-<p>
-- <a href="http://www.subatomicglue.com/download/spew.tgz">spew.tgz</a>
-
-
- <h3>license</h3>
- <pre>
+## license
+```
 /*
    spew - full featured trace logger, debug output, stderr/stdout
    Copyright (c) 2006 kevin meinert all rights reserved
@@ -79,7 +63,4 @@ spew::Log.SetLevel( 3 ); // can configure from c++ side also...
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301  USA
    */
-</pre>
- 
-</body>
-</html>
+```
