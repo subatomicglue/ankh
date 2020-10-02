@@ -15,6 +15,7 @@ everything is recreated from screenshots and playing through the game
 Work in progress, this is not very far along
 
 # Build and Run
+[install npm](https://www.npmjs.com/get-npm)
 
 ```
 npm install
