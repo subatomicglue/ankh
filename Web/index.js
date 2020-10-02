@@ -243,7 +243,7 @@ let panpad630 = { bbox: { w: 1134 - 1086, h: 1519 - 1423 }, src: undefined };
 let COLLISION = 1;
 let VISIBLE = 2;
 let COLLISION_TRIGGER = 4;
-
+/*
 let actor_layout = {
   player: [ "player", other, 6.375, 6.5,			-4, -4 ],
   bullet000: [ "none", bullet, 6, 6.6, 4, 4, COLLISION | VISIBLE ],
@@ -399,7 +399,7 @@ let actor_layout = {
   benign320: [ benign( 2, 0 ), benign, 8.125, 10, 4, 4 ],
   benign321: [ benign( 2, 0 ), benign, 4.25, 9.375, 4, 4 ],
   door320: [ horzdoor, horzdoor, 6, 8.75, 4, 4 ],
-  illumina320: [ illumina( ActorInit::treasure ), illumina, 2, 11.5, 4, 4 ],
+  illumina320: [ illumina( treasure ), illumina, 2, 11.5, 4, 4 ],
 
   // room 3,3
   enemy330: [ badguy, badguy, 5.375, 3.75, 4, 4 ],
@@ -426,8 +426,8 @@ let actor_layout = {
 
 
   // room 4,0
-  suck400: [ suck(1, -4 /*damage*/), suck, 6.25, 11.5, 4, 4 ],
-  suck401: [ suck(-1, -4 /*damage*/), suck, 6.25, 2.125, 4, 4 ],
+  suck400: [ suck(1, -4 ), suck, 6.25, 11.5, 4, 4 ],
+  suck401: [ suck(-1, -4 ), suck, 6.25, 2.125, 4, 4 ],
 
   // room 4,1
 
@@ -528,7 +528,7 @@ let actor_layout = {
   door610: [ horzdoor, horzdoor, 6, 5, 4, 4 ],
   doorlock610: [ doorlock( door600 ), lockface, 3.125, 9.875, 4, 4 ],
   musicbox610: [ musicbox( piano461, RIGHT, SHOOT ), musicbox, 3, 6.625, 4, 4 ],
-  touchpad610: [ touchpad( 12 ), touchpad610, 1200, 193, /*1200px, 193px,*/   0, 0, COLLISION_TRIGGER ],
+  touchpad610: [ touchpad( 12 ), touchpad610, 1200, 193, 0, 0, COLLISION_TRIGGER ],
   //1200,193   1293, 304
 
   // room 6,2
@@ -549,7 +549,7 @@ let actor_layout = {
   door630: [ vertdoor, vertdoor, 9, 6,		4, 4 ],
   doorlock631: [ doorlock( door630 ), lock, 9.25, 8.25, 4, 4 ],
   door631: [ horzdoor, horzdoor, 6, 9,		4, 4 ],
-  panpad630: [ interppad( -28,/*-*/ 0,   0,/*-*/ 0), panpad630, 1086px, 1423px, 0, 0, COLLISION_TRIGGER ],
+  panpad630: [ interppad( -28,0,   0,0), panpad630, 1086px, 1423px, 0, 0, COLLISION_TRIGGER ],
 
 
   // room 6,4
@@ -617,6 +617,7 @@ let actor_layout = {
   face770: [ doorlock( door661 ), lockface, 10.5, 2.75, 4, 4 ],
   flit770: [ flit, flit, 5.125, 8.75, 4, 4 ],
 };
+*/
 
 let fps = 30;  // frame rate  (film is 24hz, TV at 60hz)
 let actors = [
