@@ -14,6 +14,15 @@ everything is recreated from screenshots and playing through the game
 # Status
 Work in progress, this is not very far along
 
+# Build and Run
+
+```
+npm install
+npm start
+```
+
+point a browser to http://localhost:8080 to view.  arrow keys to move
+
 ## screenshots
 
 ![](../reference/screenshots/64rooms.an.adventure.in.the.metareal.world.png)

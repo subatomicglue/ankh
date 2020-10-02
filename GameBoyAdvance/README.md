@@ -14,6 +14,15 @@ everything is recreated from screenshots and playing through the game
 # Status
 I got about 90% of the game working on actual GBA hardware, playable.  But I think ran out of RAM and started getting lockup problems on hardware (worked great in the VirtualBoyAdvance emulator).   Life caught up and then Lost interest.
 
+# Build and Run
+
+To build the game, you'll need a GBA toolchain.
+ * Let me google that for you: [How to Compile for GBA](https://www.google.com/search?q=how+to+compile+for+GBA&oq=how+to+compile+for+GBA)
+
+How to do this is an exercise left to the reader.  Someday I might give more info.  But for now, experienced GBA developers will know what to do, and beginners will need to figure it out.
+
+Once you have built the `gba` file from source code, you can load the `gba` cartdrige image into an emulator like [VisualBoyAdvance](https://www.google.com/search?q=visualboyadvance&oq=visualboyadvance)
+
 ## screenshots
 
 ![](../reference/screenshots/64rooms.an.adventure.in.the.metareal.world.png)
