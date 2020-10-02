@@ -3,7 +3,6 @@
 a recreation of the 1980's AppleIIe prerelease of the game "ANKH" (by David VanBrink published by Datamost).  
 
  * [.. back one directory](../../..) 
-   * [ANKH for Game Boy Advance](../GameBoyAdvance) - done around 2004-2005 ish...
    * [ANKH for web](../Web) - circa 2018 ish...
 
 why recreate the prerelease?  it's the one I played, know well, and love.
