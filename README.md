@@ -9,5 +9,7 @@ ports of the 1980's AppleIIe prerelease of the game "ANKH" (by David VanBrink pu
 
 ![](reference/screenshots/64rooms.an.adventure.in.the.metareal.world.png)
 ![](reference/screenshots/room1x1.png)
+![](reference/screenshots/this.is.a.preliminary.version.png)
 ![](reference/art/2767440-ankh_apple_ii_1_1.jpg)
 
+![ [Complete Map](reference/map/ankhmap.jpg) ](reference/map/ankhmap-placement.gif)
