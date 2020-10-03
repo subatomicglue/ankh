@@ -4,30 +4,37 @@
 
 // given an x,y offset, a radius and an angle (rad)
 // return the computed x,y point
-function radialToCartesian( x,y,radius,angle_rad ) {
+export function radialToCartesian( x,y,radius,angle_rad ) {
   return {
      x: x + radius * Math.cos( angle_rad ),
      y: y + radius * Math.sin( angle_rad )
   };
 }
+//module.exports.radialToCartesian = radialToCartesian;
+
 // create a vector from a scalar (number)
-function vec( n, n2=n ) { return {x: n, y: n2}; }
+export function vec( n, n2=n ) { return {x: n, y: n2}; }
+
 // square the number
-function sqr( n ) { return n*n; }
+export function sqr( n ) { return n*n; }
+
 // return the magnitude of the vector
-function mag( v ) {
+export function mag( v ) {
   return Math.sqrt( sqr( v.x ) + sqr( v.y ) );
 }
+
 // reverse (invert) the direction of the vector
-function inv( v ) {
+export function inv( v ) {
   return {x: -v.x, y: -v.y};
 }
+
 // return the distance from p0 to p1
-function dist( p0, p1 ) {
+export function dist( p0, p1 ) {
   return mag( sub( p0, p1 ) );
 }
+
 // perpendicular vector (rotated 90 deg)
-function perp( v ) {
+export function perp( v ) {
   let theta = -90 * Math.PI / 180;
   let cs = Math.cos(theta);
   let sn = Math.sin(theta);
@@ -36,33 +43,40 @@ function perp( v ) {
      y: v.x * sn + v.y * cs,
   }
 }
+
 // return the unnormalized vector from p1 to p0
-function sub( p0, p1 ) {
+export function sub( p0, p1 ) {
   return {x: p0.x - p1.x, y: p0.y - p1.y};
 }
+
 // add p1 to p0
-function add( p0, p1 ) {
+export function add( p0, p1 ) {
   return {x: p0.x + p1.x, y: p0.y + p1.y};
 }
+
 // multiply p1 & p0
-function mul( p0, p1 ) {
+export function mul( p0, p1 ) {
   return {x: p0.x * p1.x, y: p0.y * p1.y};
 }
+
 // divide p0 / p1
-function div( p0, p1 ) {
+export function div( p0, p1 ) {
   return {x: p0.x / p1.x, y: p0.y / p1.y};
 }
+
 // normalize the vector
-function norm( v ) {
+export function norm( v ) {
   let d = mag( v );
   return {x: v.x/d, y: v.y/d};
 }
+
 // return the normalized direction vector for the two points.
-function dir( p0, p1 ) {
+export function dir( p0, p1 ) {
   return norm( sub( p0, p1 ) );
 }
+
 // http://paulbourke.net/geometry/pointlineplane/
-function line_intersect(v1, v2, v3, v4) {
+export function line_intersect(v1, v2, v3, v4) {
   let denom = (v4.y - v3.y)*(v2.x - v1.x) - (v4.x - v3.x)*(v2.y - v1.y);
   if (denom == 0) {
      return null; // parallel lines;
@@ -76,26 +90,31 @@ function line_intersect(v1, v2, v3, v4) {
      seg2: ub >= 0 && ub <= 1  // if either are false, then lines intersect
   };
 }
-function dot( v1, v2 ) {
+
+export function dot( v1, v2 ) {
  return v1.x * v2.x + v1.y * v2.y;
 }
+
 // 2D cross product doesn't makes sense, or does it?
 // do the 3D cross product of 2D vectors, result.x and .y will be 0, so
 // simply return the z component only.  You can test for >0 or <0
-function cross( v1, v2 ) {
+export function cross( v1, v2 ) {
  return (v1.x * v2.y) - (v1.y * v2.x);
 }
+
 // returns angle in radians
-function angle( v1, v2 ) {
+export function angle( v1, v2 ) {
  let z = cross( v1, v2 );
  let a = Math.acos( dot( norm( v1 ), norm( v2 ) ) );
  return z > 0 ? a : -a;
 }
+
 // floor each dimension of the vec
-function floor( v ) {
+export function floor( v ) {
   return {x: Math.floor( v.x ), y: Math.floor( v.y )};
 }
+
 // ceil each dimension of the vec
-function ceil( v ) {
+export function ceil( v ) {
   return {x: Math.ceil( v.x ), y: Math.ceil( v.y )};
 }
