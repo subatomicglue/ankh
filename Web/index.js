@@ -1,5 +1,4 @@
-
-//import { sub, vec, floor, div } from "./math.js";
+import { sub, vec, floor, div } from "./math.js";
 import { Map } from "./map.js";
 import { Sprite } from "./sprite.js";
 
@@ -9,7 +8,7 @@ function collideAgainstMap( actor ) {
   //   actor.y += actor.dy * 1/fps; // move by dy every second
   // }
 
-  if (!actors[0].collideBox( actor.x + actor.bbox.x + actor.dx * 1/fps,
+  if (!map.collideBox( actor.x + actor.bbox.x + actor.dx * 1/fps,
                             actor.y + actor.bbox.y + actor.dy * 1/fps,
                             actor.bbox.w,
                             actor.bbox.h )) {
@@ -30,16 +29,19 @@ function clear( ctx ) {
 
 let fps = 30;  // frame rate  (film is 24hz, TV at 60hz)
 let actors;
+let map;
 
 ////////////////////////////////////////////////////////////////////////////////
 // INIT
 ////////////////////////////////////////////////////////////////////////////////
 
 async function init() {
-  let map = await (await fetch("map.json")).json();
+  let mapdata = await (await fetch("map.json")).json();
+  map = new Map( "assets/walls.png", 16, 8, 12*8, mapdata, [2, 7, 12, 17] );
+
   actors = [
-    new Map( "assets/walls.png", 16, 8, 12*8, map, [2, 7, 12, 17] ),
-  
+    map,
+
     // actors[1] is the player character
     new Sprite( "assets/other.png", 360,40, 1,1, {
         default: {interval: 0.0, frames: [[0,0], ] },
