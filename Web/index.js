@@ -37,13 +37,13 @@ let map;
 
 async function init() {
   let mapdata = await (await fetch("map.json")).json();
-  map = new Map( "assets/walls.png", 16, 8, 12*8, mapdata, [2, 7, 12, 17] );
+  map = new Map( mapdata.spritemap, mapdata.tilesx, mapdata.tilesy, mapdata.mapx, mapdata.tiles, mapdata.not_collidable );
 
   actors = [
     map,
 
     // actors[1] is the player character
-    new Sprite( "assets/other.png", 360,40, 1,1, {
+    new Sprite( "assets/other.png", 300,40, 1,1, {
         default: {interval: 0.0, frames: [[0,0], ] },
       },
       { x: 0, y: 0, w: 22, h: 14 }, // bounding box
@@ -64,6 +64,10 @@ function draw() {
   }
 }
 
+function update( t ) {
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // RESIZE
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,13 +83,34 @@ function resize() {
   }
 }
 
+// main loop
+let frameid = 0;
+let running = false;
+// t is a DOMHighResTimeStamp provided by requestAnimationFrame.
+function start() {
+  running = true;
+  console.log( "starting main loop" );
+  function _start( t ) {
+    //let now = window.performance.now();
+    frameid = window.requestAnimationFrame( _start );
+    resize();
+    update( t );
+    draw();
+  }
+  _start( 0.0 );
+}
+function stop() {
+  running = false;
+  console.log( "pausing main loop" );
+  window.cancelAnimationFrame( frameid );
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // start the game loop
-init();
-setInterval( () => {
-  resize();
-  draw();
-}, 1000 / fps );
+(async ()=>{
+  await init();
+  start();
+})();
 
 ////////////////////////////////////////////////////////////////////////////////
 // respond to Input
@@ -146,3 +171,10 @@ document.onkeyup = (event) => {
   console.log('keyup event\n\n' + 'key: ' + event.key, " repeat: ", event.repeat);
 };
 
+function onvischange(e) {
+  if (running)  if (e.type == "blur"  || (e.type == "visibilitychange" && document.visibilityState === 'hidden')) { stop(); }
+  if (!running) if (e.type == "focus" || (e.type == "visibilitychange" && document.visibilityState === 'visible')) { start(); }
+}
+document.body.onblur=onvischange; 
+document.body.onfocus=onvischange; 
+document.addEventListener("visibilitychange", onvischange);

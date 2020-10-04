@@ -13,7 +13,7 @@ import { sub, vec, floor, div } from "./math.js";
 // example usage:
 //   let map = new Map( "walls.jpg", 8, 16, 32, [2,2,2,2, 2,3,4,2, 2,5,6,2, 2,2,2,2], [2, 6] )
 //   map.draw( canvas.getContext("2d") );
-export function Map( filename, tilesx = 8, tilesy = 16, mapx = 4, map = [2,2,2,2, 2,3,4,2, 2,5,6,2, 2,2,2,2], collidable = [2, 7, 12, 17] ) {
+export function Map( filename, tilesx = 8, tilesy = 16, mapx = 4, map = [2,2,2,2, 2,3,4,2, 2,5,6,2, 2,2,2,2], not_collidable = [93] ) {
   this.img = new Image();    // a new empty image
   this.img.addEventListener( "load", () => {
     this.width = this.img.width / this.tilesx;
@@ -25,7 +25,7 @@ export function Map( filename, tilesx = 8, tilesy = 16, mapx = 4, map = [2,2,2,2
   this.tilesy = tilesy;   // number of y sprites in the image
   this.mapx = mapx;       // number of x sprites in the map
   this.map = map;         // the sprite layout to draw.  e.g. [ 2,2,2,2 ], where each ID is an index into the image counting from left to right, starting at top left.
-  this.collidable = collidable; // which sprite indexes are collidable
+  this.not_collidable = not_collidable; // which sprite indexes are not collidable
   this.x = 0;             // offset to draw the map into the canvas
   this.y = 0;             // offset to draw the map into the canvas
 
@@ -73,12 +73,12 @@ export function Map( filename, tilesx = 8, tilesy = 16, mapx = 4, map = [2,2,2,2
       for (let i = min_map.x; i <= max_map.x; ++i) {
         let index = i + j * this.mapx;
         let id = this.map[index];
-        if (this.collidable.find( r => r == id )) {
-          return true;
+        if (this.not_collidable.find( r => r == id )) {
+          return false; // no collision
         }
       }
     }
-    return false; // no collision
+    return true; 
   }
 }
 
