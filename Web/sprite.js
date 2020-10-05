@@ -23,6 +23,10 @@ export function Sprite( filename, x, y, tilesx = 9, tilesy = 4, sequences = {def
       console.log( ` - autocompute bbox = ${this.bbox}` )
     }
   });
+  this.img.addEventListener( "error", () => {
+    console.log(`ERROR loading ${filename}`);
+    this.img.src = 'assets/missing.png';
+  });
   this.img.src = filename;  // loads the image
   this.x = x;               // sprite x position
   this.y = y;               // sprite y position
@@ -37,6 +41,7 @@ export function Sprite( filename, x, y, tilesx = 9, tilesy = 4, sequences = {def
   this.dy = 0;              // velocity in y
   this.bbox = bbox;         // collision bounding box relative to x/y
   this.showbbox = false;    // debug: display the bounding box
+  this.update = updateFunc; //
 
   // draw the sprite using the given canvas ctx
   this.draw = function( ctx ) {   
@@ -49,6 +54,7 @@ export function Sprite( filename, x, y, tilesx = 9, tilesy = 4, sequences = {def
                     this.bbox.w,
                     this.bbox.h );
     //ctx.globalCompositeOperation = "screen";
+    if (filename == undefined) return;
     ctx.drawImage( this.img,
       frame[0] * this.width, frame[1] * this.height,
       this.width, this.height, // original image pixels
@@ -59,7 +65,7 @@ export function Sprite( filename, x, y, tilesx = 9, tilesy = 4, sequences = {def
     this.anim = (this.anim + this.animation.interval) % this.animation.frames.length;
     //console.log( `${Math.floor( this.anim ) * this.width} ${Math.floor( this.bank ) * this.height}`)
 
-    updateFunc( this );
+    //updateFunc( this );
   };
 
   // change animation

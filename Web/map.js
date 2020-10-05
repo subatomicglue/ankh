@@ -15,11 +15,15 @@ import { sub, vec, floor, div } from "./math.js";
 //   map.draw( canvas.getContext("2d") );
 export function Map( filename, tilesx = 8, tilesy = 16, mapx = 4, map = [2,2,2,2, 2,3,4,2, 2,5,6,2, 2,2,2,2], not_collidable = [93] ) {
   this.img = new Image();    // a new empty image
-  this.img.addEventListener( "load", () => {
-    this.width = this.img.width / this.tilesx;
-    this.height = this.img.height / this.tilesy;
-    console.log( `Map ${filename} loaded ${this.img.width} x ${this.img.height} total, ${this.width} x ${this.height} per tile, ${tilesx} x ${tilesy} tiles`)
-  });
+  // you can await on this promise
+  this.img_done = new Promise( (rs, rj) => {
+    this.img.addEventListener( "load", () => {
+      this.width = this.img.width / this.tilesx;
+      this.height = this.img.height / this.tilesy;
+      console.log( `Map ${filename} loaded ${this.img.width} x ${this.img.height} total, ${this.width} x ${this.height} per tile, ${tilesx} x ${tilesy} tiles`)
+      rs();
+    });
+  })
   this.img.src = filename;// loads the image
   this.tilesx = tilesx;   // number of x sprites in the image
   this.tilesy = tilesy;   // number of y sprites in the image
@@ -28,6 +32,7 @@ export function Map( filename, tilesx = 8, tilesy = 16, mapx = 4, map = [2,2,2,2
   this.not_collidable = not_collidable; // which sprite indexes are not collidable
   this.x = 0;             // offset to draw the map into the canvas
   this.y = 0;             // offset to draw the map into the canvas
+  this.update = (ths) => {};
 
   this.draw = function( ctx ) {
     // todo: detect parent viewport extents, dont bother drawing out of bounds

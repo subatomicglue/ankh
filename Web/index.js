@@ -1,6 +1,9 @@
 import { sub, vec, floor, div } from "./math.js";
 import { Map } from "./map.js";
 import { Sprite } from "./sprite.js";
+import { game_data } from "./game_data.js";
+
+//console.log( game_data );
 
 function collideAgainstMap( actor ) {
   // if (!actors[0].collide( actor.x + actor.dx * 1/fps, actor.y + actor.dy * 1/fps )) {
@@ -28,7 +31,7 @@ function clear( ctx ) {
 ////////////////////////////////////////////////////////////////////////////////
 
 let fps = 30;  // frame rate  (film is 24hz, TV at 60hz)
-let actors;
+let actors = [];
 let map;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,18 +41,41 @@ let map;
 async function init() {
   let mapdata = await (await fetch("map.json")).json();
   map = new Map( mapdata.spritemap, mapdata.tilesx, mapdata.tilesy, mapdata.mapx, mapdata.tiles, mapdata.not_collidable );
+  await map.img_done;
 
-  actors = [
-    map,
+  // map always first
+  actors.push( map );
 
-    // actors[1] is the player character
-    new Sprite( "assets/other.png", 300,40, 1,1, {
+  for (let actor_def of game_data.actor_layout) {
+    let sprite = game_data.sprites[actor_def.sprite];
+    function parseNumber( n, m ) { return typeof(n)==="number" ? (n-1)*m : parseInt(n) ? (parseInt(n)-1)*m : parseInt( n.match(/([0-9]+)px/)[1] ) }
+    actor_def.x = parseNumber( actor_def.x, map.width );
+    actor_def.y = parseNumber( actor_def.y, map.height );
+    if (actor_def.room) {
+      let ax = actor_def.x + actor_def.room[0] * mapdata.roomx*map.width;
+      let ay = actor_def.y + actor_def.room[1] * mapdata.roomy*map.height;
+      console.log( "room translating", actor_def.x, actor_def.y, "to", ax, ay )
+      actor_def.x = ax;
+      actor_def.y = ay;
+    }
+    console.log( `Actor: type:${actor_def.type} sprite:${actor_def.sprite} img:${sprite.src} ${actor_def.x},${actor_def.y}` );
+    let actor = new Sprite( sprite.src, actor_def.x, actor_def.y, sprite.tilesx ? sprite.tilesx : 1, sprite.tilesy ? sprite.tilesy : 1, {
         default: {interval: 0.0, frames: [[0,0], ] },
       },
-      { x: 0, y: 0, w: 22, h: 14 }, // bounding box
+      { x: sprite.bbox.x, y: sprite.bbox.y, w: sprite.bbox.w, h: sprite.bbox.h }, // bounding box
       collideAgainstMap
-    ),
-  ]; // end of actor array...
+    );
+    actors.push( actor );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// UPDATE
+////////////////////////////////////////////////////////////////////////////////
+function update( t ) {
+  for (let x=0; x < actors.length; ++x) {
+    actors[x].update( actors[x], t );
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,10 +88,6 @@ function draw() {
   for (let x=0; x < actors.length; ++x) {
     actors[x].draw( ctx );
   }
-}
-
-function update( t ) {
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +105,10 @@ function resize() {
   }
 }
 
-// main loop
+////////////////////////////////////////////////////////////////////////////////
+// MAIN LOOP
+////////////////////////////////////////////////////////////////////////////////
+
 let frameid = 0;
 let running = false;
 // t is a DOMHighResTimeStamp provided by requestAnimationFrame.
