@@ -2,6 +2,13 @@
 // math and 2D vector math  {x: 0, y: 0}
 //////////////////////////////////////
 
+export class Vec {
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
 // given an x,y offset, a radius and an angle (rad)
 // return the computed x,y point
 export function radialToCartesian( x,y,radius,angle_rad ) {
