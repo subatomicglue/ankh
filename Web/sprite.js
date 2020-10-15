@@ -10,7 +10,7 @@
 //   updateFunc = called for each draw()
 //
 // example usage:
-//   let actor = new Sprite( "sprites.png", 40,40, 9,4, { default: {rate: 0.05, frames: [[0,3], ] } }, { x: 22, y: 15, w: 20, h: 48 }, actor => {} )
+//   let actor = new Sprite( "sprites.png", 40,40, 9,4, { default: {fps: 0.05, frames: [[0,3], ] } }, { x: 22, y: 15, w: 20, h: 48 }, actor => {} )
 
 import { Vec } from "./math.js";
 import { BEHAVIOR_THINGS } from "./behaviors.js";
@@ -25,8 +25,8 @@ export class Sprite {
   width;               // width  of the sprite in pixels (set once img loads)
   height;              // height of the sprite in pixels (set once img loads)
   anim;            // animation clock, controls which frame to display, loops
-  sequences; // collection of named animation sequences, e.g. { default: {rate: 0.4, frames: [[0,0], [1,0]]}, ... }
-  animation; // current sequence, e.g. {rate: 0.4, frames: [[0,0], [1,0]]}
+  sequences; // collection of named animation sequences, e.g. { default: {fps: 0.4, frames: [[0,0], [1,0]]}, ... }
+  animation; // current sequence, e.g. {fps: 0.4, frames: [[0,0], [1,0]]}
   dx;              // velocity in x
   dy;              // velocity in y
   bbox;         // collision bounding box relative to x/y
@@ -36,7 +36,7 @@ export class Sprite {
   missing_image = 'assets/missing.png';
   collided = false;
 
-  constructor( filename, x, y, tilesx = 9, tilesy = 4, sequences = {default: {rate: 0.4, frames: [[0,0], [1,0]]} }, bbox = { x: 22, y: 15, w: 20, h: 48 }, updateFunc = (s) => {} ) {
+  constructor( filename, x, y, tilesx = 9, tilesy = 4, sequences = {default: {fps: 0.4, frames: [[0,0], [1,0]]} }, bbox = { x: 22, y: 15, w: 20, h: 48 }, updateFunc = (s) => {} ) {
     if (filename == undefined) {
       console.info( `ERROR: Sprite has bad filename ${filename}` );
       filename = this.missing_image;
@@ -49,8 +49,8 @@ export class Sprite {
     this.width;               // width  of the sprite in pixels (set once img loads)
     this.height;              // height of the sprite in pixels (set once img loads)
     this.anim = 0;            // animation clock, controls which frame to display, loops
-    this.sequences = sequences; // collection of named animation sequences, e.g. { default: {rate: 0.4, frames: [[0,0], [1,0]]}, ... }
-    this.animation = this.sequences.default; // current sequence, e.g. {rate: 0.4, frames: [[0,0], [1,0]]}
+    this.sequences = sequences; // collection of named animation sequences, e.g. { default: {fps: 0.4, frames: [[0,0], [1,0]]}, ... }
+    this.animation = this.sequences.default; // current sequence, e.g. {fps: 0.4, frames: [[0,0], [1,0]]}
     this.dx = 0;              // velocity in x
     this.dy = 0;              // velocity in y
     this.bbox = bbox;         // collision bounding box relative to x/y
@@ -85,9 +85,6 @@ export class Sprite {
                     this.bbox.h );
     //ctx.globalCompositeOperation = "screen";
     if (this.img.src == undefined) { console.error( `ERROR: Sprite has bad filename ${filename}` ); return; }
-    if (this.frame == undefined) {
-      console.log( "oops", this.anim, this.animation.frames, this.animation.frames[Math.floor( this.anim )] );
-    }
     ctx.drawImage( this.img,
       this.frame[0] * this.width,
       this.frame[1] * this.height,
@@ -100,10 +97,7 @@ export class Sprite {
   update( t ) {
     // sprite flipbook animation
     this.frame = this.animation.frames[Math.floor( this.anim )]
-    this.anim = (this.anim + this.animation.rate * t) % this.animation.frames.length;
-    if (this.anim < 0 || 1 < t) {
-      console.log( "oops", this.anim, this.animation.frames, this.animation.rate, t, this.animation.frames.length, this.animation.frames[Math.floor( this.anim )] );
-    }
+    this.anim = (this.anim + this.animation.fps * t) % this.animation.frames.length;
     //console.log( `${Math.floor( this.anim ) * this.width} ${Math.floor( this.bank ) * this.height}`)
 
     // custom (most likely a collision func)

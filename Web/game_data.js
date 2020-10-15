@@ -9,7 +9,7 @@ export let game_data = {
 // sprites, 2d geometry, simply a textured quad.  width, height, bitmap
 sprites: {
   badguy: { bbox: { x: 0, y: 0, w: 6, h: 3 }, src: "assets/badguy.png" },
-  benign: { bbox: { x: 0, y: 0, w: 15, h: 7 }, tilesx: 1, tilesy: 2, anim_seq: {default: {rate: 4, frames: [[0,0], [0,1]]}}, src: "assets/benign.png" },
+  benign: { bbox: { x: 0, y: 0, w: 15, h: 7 }, tilesx: 1, tilesy: 2, anim_seq: {default: {fps: 4, frames: [[0,0], [0,1]]}}, src: "assets/benign.png" },
   bonus: { bbox: { x: 0, y: 0, w: 13, h: 7 }, src: "assets/bonus.png" },
   box: { bbox: { x: 0, y: 0, w: 9, h: 7 }, src: "assets/box.png" },
   chalice: { bbox: { x: 0, y: 0, w: 11, h: 5 }, src: "assets/chalice.png" },

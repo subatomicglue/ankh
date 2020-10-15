@@ -34,7 +34,6 @@ function clear( ctx ) {
 // game data
 ////////////////////////////////////////////////////////////////////////////////
 
-let fps = 30;  // frame rate  (film is 24hz, TV at 60hz)
 export let actors = [];
 export let map;
 export let player;
@@ -65,7 +64,7 @@ async function init() {
     }
     console.log( `Actor: '${actor_def.name}' beh:${actor_def.behavior} spr:${actor_def.sprite} img:${sprite_def.src} [${actor_def.x},${actor_def.y}]` );
     let sprite = new Sprite( sprite_def.src, actor_def.x, actor_def.y, sprite_def.tilesx ? sprite_def.tilesx : 1, sprite_def.tilesy ? sprite_def.tilesy : 1, 
-      sprite_def.anim_seq ? sprite_def.anim_seq : {default: {rate: 0, frames: [[0,0]] }},
+      sprite_def.anim_seq ? sprite_def.anim_seq : {default: {fps: 0, frames: [[0,0]] }},
       sprite_def.bbox,
       simVelocity
     );
@@ -127,9 +126,6 @@ function start() {
   console.log( "starting main loop" );
   function _start( t ) {
     let td = last_time == 0 ? 1/60 : (t-last_time) * div_by_1000;
-    if (td < 0) {
-      console.log( "oops", t, last_time );
-    }
     frameid = window.requestAnimationFrame( _start );
     resize();
     update( td );
