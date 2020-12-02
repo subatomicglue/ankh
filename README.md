@@ -9,8 +9,8 @@ why recreate the prerelease?  it's the one I played, know well, and love.
 
 everything is recreated from screenshots and playing through the game
 
-**this is an omage:**  much respect and love for this game
-**it's also my stress relief:**  I like to pick at this project in my spare time for fun.  Implementing this game from scratch is a fun puzzle to solve.
+ * **this is an omage:**  much respect and love for this game
+ * **it's also my stress relief:**  I like to pick at this project in my spare time for fun.  Implementing this game from scratch is a fun puzzle to solve.
 
 ## screenshots
 
