@@ -11,10 +11,10 @@ everything is recreated from screenshots and playing through the game
 
 **this is an omage:**  much respect and love for this game
 
-**it's also my stress relief:**  I like to pick at this project in my spare time for fun.  Implementing this game from scratch is a fun puzzle to solve.
+**it was my stress relief:**  I worked on this in the early 2000's in my spare time for fun.  Implementing this game from scratch was a fun puzzle to solve.
 
 # Status
-I got about 90% of the game working on actual GBA hardware, playable.  But I think ran out of RAM and started getting lockup problems on hardware (worked great in the VirtualBoyAdvance emulator).   Life caught up and then Lost interest.
+I got about 90% of the game working on actual GBA hardware, playable.  But I think ran out of RAM and started getting lockup problems on hardware (worked great in the VirtualBoyAdvance emulator).   Life caught up and then Lost interest.  I don't plan to finish this work.
 
 # Build and Run
 
