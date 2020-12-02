@@ -3,13 +3,15 @@
 a recreation of the 1980's AppleIIe prerelease of the game "[ANKH](http://dvb.omino.com/dvb/software/ankh/index.html)" (by [David VanBrink](http://metareal.net/) published by [Datamost](https://en.wikipedia.org/wiki/Datamost).  
 
  * [.. back one directory](../../..) 
-   * [ANKH for Web](../Web) - circa 2018 ish...
+   * [ANKH for Web](../Web) - very unfinished work circa 2018 ish...
 
 why recreate the prerelease?  it's the one I played, know well, and love.
 
 everything is recreated from screenshots and playing through the game
 
 **this is an omage:**  much respect and love for this game
+
+**it's also my stress relief:**  I like to pick at this project in my spare time for fun.  Implementing this game from scratch is a fun puzzle to solve.
 
 # Status
 I got about 90% of the game working on actual GBA hardware, playable.  But I think ran out of RAM and started getting lockup problems on hardware (worked great in the VirtualBoyAdvance emulator).   Life caught up and then Lost interest.
