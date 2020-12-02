@@ -3,7 +3,7 @@
 a recreation of the 1980's AppleIIe prerelease of the game "[ANKH](http://dvb.omino.com/dvb/software/ankh/index.html)" (by [David VanBrink](http://metareal.net/) published by [Datamost](https://en.wikipedia.org/wiki/Datamost).  
 
  * [.. back one directory](../../..) 
-   * [ANKH for Game Boy Advance](../GameBoyAdvance) - very unfinished work circa 2004-2005 ish...
+   * [ANKH for Game Boy Advance](../GameBoyAdvance) - unfinished work circa 2004-2005 ish...
 
 why recreate the prerelease?  it's the one I played, know well, and love.
 
