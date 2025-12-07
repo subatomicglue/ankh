@@ -3,57 +3,90 @@
 # **ENGINE ARCHITECTURE SPEC v1.0**
 # ============================================================
 
+A Game Engine for Web Browser.
+- 2D map based games with sprites will be supported with the first version
+- Games are defined in a single world.json project file.
+  - Scene of Actors with Behaviors and Assets (like Map or Sprites, and Sounds)
+  - Editor is data driven via pluggable web component, can edit or create new ones
+  - In Game UI is data driven via pluggable web component, can edit or create new ones
+- Game Project Editing provided by the editor-backend service
+  - create and edit game projects, game editors, in game UIs, game assets (like Sprites, Maps, Sounds, Behaviors)
+  - browser-based intuitive WYSIWYG GUI
+  - asset management with version control stored to local filesystem.
+  - editor-backend service provides a basic code-editor with preview
+    - The only built-in editor provided
+      - for creating custom Game Project Editor web-components.
+      - for creating custom InGameUI web-components.
+    - Game Project Editor can be created (bootstrapped) from nothing using provided reusable components
+    - ... or by copying an existing editor definition and modifying it.
+    - InGameUI can be created (bootstrapped) from nothing using provided reusable components
+    - ... or by copying an existing editor definition and modifying it.
+- Runtime game is created inside index.html with a single <game data="world.json"></game> html element
+
 ```
-Engine:      JavaScript + HTML + CSS
+TechStack:   JavaScript + HTML + CSS
 Renderer:    Canvas 2D + HTML overlay
-Editor:      Web Components + Backend FS abstraction
+Editor:      Pluggable Editable Web Components + Backend FS abstraction
 Philosophy:  Data-driven, Behavior-centric, JSON Defs
-Project:     world.json is the ENTIRE game (and editor config)
+Project:     world.json is the ENTIRE game (with ingame UI and editor)
 ```
 
 ---
 
 # ============================================================
-
 # 1. CORE DESIGN PRINCIPLES
-
 # ============================================================
 
 ```
-1. All reusable asset templates are "Defs".
+1. Asset Definitions:  Assets are defined as "Defs"
    ActorDef, SpriteDef, MapDef, SoundDef, UIDef, EditorDef.
+   Serve as prototypes (templates) for creating runtime instances.
 
-2. All runtime objects (Actor, Map, SpriteInstance, Sound, UI, Editor)
-   implicitly refer to a Def via:   "def": "<DefName>".
+2. Asset Instances:  All runtime objects (Actor, Map, Sprite, Sound, UI, Editor)
+   implicitly instantiate an AssetDefinition, by refering to their Def via:  "def": "<DefName>".
 
-3. No world.json schema ever uses the word "instance".
+3. Asset Naming:  We'll use "Def", but not "instance" inside world.json schema,
+   instance types are short/simple in the json text (Actor, Map, Sprite, Sound, UI, Editor).
+   def types are longer in the json text (ActorDef, MapDef, SpriteDef, SoundDef, UIDef, EditorDef).
 
-4. Actors hold state. Behaviors hold logic AND state.
+4. Actors hold state, which is used by behavior logic.
+   Behaviors hold both logic AND it's own state.  Behavior logic can use actor state as well.
    Defs hold immutable configuration.
-
+   
 5. Triggers are the universal communication mechanism.
+   Actor has emitTrigger( name, params ), which dispatches down the hierarchy to child behavior(s) and actor(s).
 
-6. Engine input and UI input both emit triggers into the root Actor.
+6. Engine input and In Game UI both emit triggers into the root Actor.
+   Behaviors can emit triggers into other actors
 
-7. world.json defines the entire project: assets, defs, world actor, editor, ui.
+7. world.json defines the entire project:
+   - asset defs and instances
+   - root world actor with child actors
+   - editor
+   - in game ui
 
-8. Editor and Game UI are Web Components loaded via UIDef and EditorDef.
+8. Editor and In Game UI are Web Components (just javascript/html/css code)
+   defined via world.json's UIDef and EditorDef
+   a world.json has one editor and one ui, set by "editor" and "ui" (which refers to EditorDef and UIDef)
 
-9. Loader handles:
-     - inline JS or JSON
-     - include JS or JSON
-     - pure JS Defs
-     - pure JSON Defs
+9. One Reusable Loader in the world.json schema
+   looks like:  { include: "file.js" } or { inline: "javascript_code_goes_here()" }
+   which handles:
+    - include JS or JSON
+    - inline JS or JSON
 
-10. Everything is extensible: new Def types can be added easily.
+10. Everything is extensible:
+    new Def types can be added easily.
+    editor can be replaced
+    ingame ui can be replaces
+    behaviors allow new custom logic
+    we'll build libraries of reusable components so building these are easy, but some editor/ingameui/behaviors will be very game specific, of course.
 ```
 
 ---
 
 # ============================================================
-
 # 2. WORLD.JSON STRUCTURE (TOP LEVEL)
-
 # ============================================================
 
 ```
