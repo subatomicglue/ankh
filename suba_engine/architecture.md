@@ -4,23 +4,23 @@ A Game Engine for Web Browser.
 
 - Features at a glance:
   - 2D map based games with sprites will be supported with the first version
-  - Games are defined in a single world.json project file.
-    - Scene of Actors with Behaviors and Assets (like Map or Sprites, and Sounds)
-    - Editor is data driven via pluggable web component, can edit or create new ones
-    - In Game UI is data driven via pluggable web component, can edit or create new ones
-  - Game Project Editing provided by the editor-backend service
-    - create and edit game projects, game editors, in game UIs, game assets (like Sprites, Maps, Sounds, Behaviors)
+  - Games are defined in a single `world.json` project file.
+    - Scene of `Actor`s with `Behavior`s and `Asset`s (like `Map` or `Sprite`s, and `Sound`s)
+    - `Game Project Editor` is data driven via pluggable web component, can edit or create new ones
+    - `In Game UI` is data driven via pluggable web component, can edit or create new ones
+  - Game Project Editing provided by the `editor-backend.js` service
+    - create and edit game projects, game editors, in game UIs, game assets (like `Sprite`s, `Map`s, `Sound`s, `Behavior`s)
     - browser-based intuitive WYSIWYG GUI
     - asset management with version control stored to local filesystem.
-    - editor-backend service provides a basic code-editor with preview
+    - `editor-backend.js` service provides a basic code-editor with preview
       - The only built-in editor provided
         - for creating custom `GameProjectEditor` web-components.
         - for creating custom `InGameUI` web-components.
-      - Game Project Editor can be created (bootstrapped) from nothing using provided reusable components
+      - `Game Project Editor` can be created (bootstrapped) from nothing using provided reusable components
       - ... or by copying an existing editor definition and modifying it.
       - `InGameUI` can be created (bootstrapped) from nothing using provided reusable components
       - ... or by copying an existing editor definition and modifying it.
-  - Runtime game is created inside index.html with a single <game data="world.json"></game> html element
+  - Runtime game is created inside `index.html` with a single <game data="world.json"></game> html element
 
 
 | feature           | about         |
@@ -39,48 +39,50 @@ A Game Engine for Web Browser.
 # CORE DESIGN PRINCIPLES
 
 1. Asset Definitions:  Assets are first defined as "Defs"
-   - ActorDef, SpriteDef, MapDef, SoundDef, UIDef, EditorDef.
+   - `ActorDef`, `SpriteDef`, `MapDef`, `SoundDef`, `InGameUIDef`, `EditorDef`.
    - Serve as prototypes (templates) for creating runtime Asset instances of those types.
 
-2. Asset instances:  All runtime objects (Actor, Map, Sprite, Sound, UI, Editor)
-   - implicitly instantiate an AssetDefinition, by refering to their Def via:  "def": "<DefName>".
+2. Asset instances:  All runtime objects (`Actor`, `Map`, `Sprite`, `Sound`, `InGameUI`, `GameProjectEditor`)
+   - implicitly instantiate an `<Asset>Def`, by refering to their Def via:  `"def": "<DefName>"`.
 
 3. Asset Naming:  We'll use "Def", but not "instance" inside world.json schema,
-   - instance types are short/simple in the json text (Actor, Map, Sprite, Sound, UI, Editor).
-   - def types are longer in the json text (ActorDef, MapDef, SpriteDef, SoundDef, UIDef, EditorDef).
+   - instance types are short/simple in the json text (`Actor`, `Map`, `Sprite`, `Sound`, `InGameUI`, `GameProjectEditor`).
+   - def types are longer in the json text (`ActorDef`, `MapDef`, `SpriteDef`, `SoundDef`, `InGameUIDef`, `EditorDef`).
 
-4. Actors hold state, which is used by behavior logic.
-   - Behaviors hold both logic AND it's own state.  Behavior logic can use actor state as well.
-   - Defs hold immutable configuration.
-   
+4. `Actors` hold state, which is used by `Behavior` logic.
+   - `Behavior`s hold both logic AND it's own state.  `Behavior` logic can use `Actor` state as well.
+     - `Behavior` state is internal for that `Behavior`.
+     - `Actor` state is can be used by multiple `Behavior`s.
+   - AssetDefs hold immutable configuration to initialize an Asset.
+
 5. Triggers are the universal communication mechanism.
-   - Actor has emitTrigger( name, params ), which dispatches down the hierarchy to child behavior(s) and actor(s).
+   - `Actor` has `emitTrigger( name, params )`, which dispatches down the hierarchy to child `Behavior`(s) and `Actor`(s).
 
-6. Engine input and In Game UI both emit triggers into the root Actor.
-   - Behaviors can emit triggers into other actors
+6. The engine's mouse/keyboard input handlers, collision system, and `InGameUI` all emit triggers into the root `Actor`.
+   - `Behavior`s can emit triggers into other `Actor`s
 
-7. world.json defines the entire project:
-   - asset defs and instances
-   - root world actor with child actors
-   - editor
-   - in game ui
+7. `world.json` defines the entire project:
+   - `<Asset>Defs` - asset definitions (which allows us to spawn instances)
+   - `actor` - actor graph - a single root 'world' `Actor` instance with child `Actor` instances
+   - `GameProjectEditor` - A game world editor that defines `<GameProjectEditor>` html web component
+   - `InGameUI` - An In Game UI that defines `<InGameUI>` html web component
 
-8. Editor and In Game UI are Web Components (just javascript/html/css code)
-   - defined via world.json's UIDef and EditorDef
-   - a world.json has one editor and one ui, set by "editor" and "ui" (which refers to EditorDef and UIDef)
+8. `GameProjectEditor` and `InGameUI` are Web Components (just javascript/html/css code)
+   - defined via `world.json`'s `InGameUIDef` and `EditorDef`
+   - a `world.json` has one `GameProjectEditor` and one `InGameUI` (which instances `EditorDef` and `InGameUIDef` respectively)
 
-9. One Reusable Loader in the world.json schema
-   - looks like:  { include: "file.js" } or { inline: "javascript_code_goes_here()" }
+9. A reusable `configLoader` pattern throughout the `world.json` schema
+   - looks like:  `config: { include: "file.js" }` or `config: { inline: "javascript_code_goes_here()" }`
    - which handles:
-     - include JS or JSON
-     - inline JS or JSON
+     - `include` JS or JSON
+     - `inline` JS or JSON
 
 10. Everything is extensible:
     - new Def types can be added easily.
-    - editor can be replaced
-    - ingame ui can be replaces
-    - behaviors allow new custom logic
-    - we'll build libraries of reusable components so building these are easy, but some editor/ingameui/behaviors will be very game specific, of course.
+    - `GameProjectEditor` can be replaced
+    - `InGameUI` can be replaced
+    - `Behavior`s allow new custom logic
+    - we'll build libraries of reusable components so building these are easy, but some `GameProjectEditor`/`ingameui`/`Behavior`s will be very game specific, of course.
 
 
 
@@ -175,7 +177,7 @@ Asset definitions serve as templates (aka prototypes) that are used when spawnin
 - `SpriteDef` - *defines* how to create an `Sprite` instance
 - `MapDef` - *defines* how to create an `Map` instance
 - `SoundDef` - *defines* how to create an `Sound` instance
-- `UIDef` - *defines* how to create an `InGameUI` html web component instance
+- `InGameUIDef` - *defines* how to create an `InGameUI` html web component instance
 - `EditorDef` - *defines* how to create an `GameProjectEditor` html web component instance
 
 ### Definition Schema:
@@ -321,8 +323,8 @@ We'll never use the word “instance” in our type names, for brevity / readabi
 - `Sprite` - spawns a `Sprite`, from the given Def
 - `Map` - spawns a `Map`, from the given Def
 - `Sound` - spawns a `Sound`, from the given Def
-- `UI` - spawns an `InGameUI` html web component, from the given Def
-- `Editor` - spawns a `GameProjectEditor` html web component, from the given Def
+- `InGameUI` - spawns an `InGameUI` html web component, from the given Def
+- `GameProjectEditor` - spawns a `GameProjectEditor` html web component, from the given Def
 
 An example def & instance relationship where `Asset` is one of the above types:
 ```
@@ -704,7 +706,7 @@ Schema
 // UI Definition, template used for spawning new UI instances (web-component)
 "UIDef": { "id": "ingameui", "config": { "include": "ingameui.js" } }
 
-// Instance `UI` is created from that `ingameui` definition:
+// Instance `InGameUI` is created from that `ingameui` definition:
 // there is only one instance, at the top-level of `world.json`
 "ui": { "def": "ingameui" }
 ```
@@ -789,8 +791,8 @@ The `editor-backend.js` when `https://localhost:8080` is loaded, displays a page
       - Selected Editor
         - displays whatever asset was selected, allowing edit if possible
           - `world.json` typically
-            - `ui` field which populates `UIDef` and `ui` in `world.json`
-            - `editor` field which populates `EditorDef` and `editor` in `world.json`
+            - `InGameUI` field which populates `InGameUIDef` and `InGameUI` in `world.json`
+            - `GameProjectEditor` field which populates `EditorDef` and `GameProjectEditor` in `world.json`
             - Save Button to write `world.json`
             - Buttons to jump to the relevant tab:  Actors, Behaviors, Sprites, Maps, Sounds, UI, Editor
 - WebComponent Code Editor (for editing files like: `ingameui.js`, `editor.js` and new variants of those)
@@ -798,25 +800,25 @@ The `editor-backend.js` when `https://localhost:8080` is loaded, displays a page
     - presents a color syntax highlighting code editor, and an editor preview pane with controls to browse assets, load and save.
   - by default
     - no `world.json` active:  displays default `editor.js` from the asset data endpoint
-    - `world.json` active:  displays `editor` from the `world.json`
+    - `world.json` active:  displays `GameProjectEditor` from the `world.json`
   - 2 panes:
     - 1 big pane with 2 sub tabs:
-      - Code Editor for the selected `EditorDef` or `UIDef`
+      - Code Editor for the selected `EditorDef` or `InGameUIDef`
       - preview pane (shows the active `<GameProjectEditor></GameProjectEditor>` or `<InGameUI></InGameUI>` being edited)
-        - displays the `UI` as defined by `UIDef` in the active `world.json`, as the `<InGameUI>` html element
-        - displays the `Editor` as defined by `EditorDef` in the active `world.json`, as the `<GameProjectEditor>` html element
+        - displays the `InGameUI` as defined by `InGameUIDef` in the active `world.json`, as the `<InGameUI>` html element
+        - displays the `GameProjectEditor` as defined by `EditorDef` in the active `world.json`, as the `<GameProjectEditor>` html element
         - if eval() of the code fails, nothing will preview until eval() passes (show the error instead of preview)
     - data panel
       - listview with list of all `EditorDef`s in `world.json` (if one is active)
         - selected `EditorDef` resets the preview pane, and the Code Editor to that `EditorDef`
         - New:    Button to creates a new `EditorDef`
         - Delete: Button to delete selected `EditorDef`
-        - Use:    Button to make the currect selected `EditorDef` active as `editor` in `world.json`
-      - listview with list of all `UIDef`s in `world.json` (if one is active)
-        - selected `UIDef` resets the preview pane, and the Code Editor to that `UIDef`
-        - New:    Button to creates a new `UIDef`
-        - Delete: Button to delete selected `UIDef`
-        - Use:    Button to make the currect selected `UIDef` active as `ui` in `world.json`
+        - Use:    Button to make the currect selected `EditorDef` active as `GameProjectEditor` in `world.json`
+      - listview with list of all `InGameUIDef`s in `world.json` (if one is active)
+        - selected `InGameUIDef` resets the preview pane, and the Code Editor to that `InGameUIDef`
+        - New:    Button to creates a new `InGameUIDef`
+        - Delete: Button to delete selected `InGameUIDef`
+        - Use:    Button to make the currect selected `InGameUIDef` active as `InGameUI` in `world.json`
       - Edit Button to jump to my Code Editor tab
       - Preview Button to jump to my preview pane tab
       - Save Button to write `world.json` and the asset
@@ -826,7 +828,7 @@ The `editor-backend.js` when `https://localhost:8080` is loaded, displays a page
   - A page with a single pane for editor or game-preview, `[new project]`, `[load project]`, `[save project]`, `[Edit Mode]` or `[Game Mode]` buttons
   - upon Project Load, the editor.js is read from the project, and `<GameProjectEditor></GameProjectEditor>` is then added to the page.
   - `[Edit Mode]` or `[Game Mode]` buttons toggle between `<game data="world.json"></game>` or `<GameProjectEditor data="{ entire world json object }"></GameProjectEditor>` in the page.
-  - will display the `world.json`'s `editor` field's `editor.js` web component `<GameProjectEditor></GameProjectEditor>`
+  - will display the `world.json`'s `GameProjectEditor` field's `editor.js` web component `<GameProjectEditor></GameProjectEditor>`
 
 Reusable Widget Library
 - reusable library of web components
@@ -857,12 +859,12 @@ or
 - several child web components under that
   - Each **tab** is a web component
   - Each **pane** is a web component
-  - Each **preview** type (that we may like to view in a "preview pane") is a web component  (`Actor`, `Behavior`, `Sprite`, `Map`, `Sound`, `UI`, `Editor`, `Code`, `Image`, `Game`, `ActorPlacement`)
+  - Each **preview** type (that we may like to view in a "preview pane") is a web component  (`Actor`, `Behavior`, `Sprite`, `Map`, `Sound`, `InGameUI`, `GameProjectEditor`, `Code`, `Image`, `Game`, `ActorPlacement`)
   - Reusable Widget Library components:
     - Each widget in a "data pane" is a web component, for example:
       1. **Data Editors**
-        - For editing `AssetDef` and `Asset` instance types (where Asset == `Actor`, `Behavior`, `Sprite`, `Map`, `Sound`, `UI`, `Editor`)
-        - ideally there is one `Asset` Editor web-component only, and can "drive it with data" to instantiate an editor for each type... (where Asset == `Actor`, `Behavior`, `Sprite`, `Map`, `Sound`, `UI`, `Editor`)
+        - For editing `AssetDef` and `Asset` instance types (where Asset == `Actor`, `Behavior`, `Sprite`, `Map`, `Sound`, `InGameUI`, `GameProjectEditor`)
+        - ideally there is one `Asset` Editor web-component only, and can "drive it with data" to instantiate an editor for each type... (where Asset == `Actor`, `Behavior`, `Sprite`, `Map`, `Sound`, `InGameUI`, `GameProjectEditor`)
       2. **listviews**  (for flat lists)
         - the data is configurable via HTML element parameter data="" & also web-component API method call setData(...)
         - with `onchange="myfunc(e)"` HTML element parameter for detecting changes
@@ -987,17 +989,17 @@ or
 - UI Definition Editor
   - 2 panes (left and right):
     - 1 big pane with 2 sub tabs:
-      - Code Editor for the selected `UIDef`
+      - Code Editor for the selected `InGameUIDef`
       - preview pane (shows the active `<InGameUI></InGameUI>` being edited)
-        - displays the `UI` as defined by `UIDef` in the active `world.json`, as the `<InGameUI>` html element
+        - displays the `InGameUI` as defined by `InGameUIDef` in the active `world.json`, as the `<InGameUI>` html element
         - Controls below the `<InGameUI></InGameUI>`:
           - behavior trigger buttons (one per named trigger in the child behaviors)
     - data panel
-      - listview with list of all `UIDef`s in `world.json`
-        - selected `UIDef` resets the preview pane, and the Code Editor to that `UIDef`
-        - New:    Button to creates a new `UIDef`
-        - Delete: Button to delete selected `UIDef`
-        - Use:    Button to make the currect selected `UIDef` active as `ui` in `world.json`
+      - listview with list of all `InGameUIDef`s in `world.json`
+        - selected `InGameUIDef` resets the preview pane, and the Code Editor to that `InGameUIDef`
+        - New:    Button to creates a new `InGameUIDef`
+        - Delete: Button to delete selected `InGameUIDef`
+        - Use:    Button to make the currect selected `InGameUIDef` active as `InGameUI` in `world.json`
       - Edit Button to jump to my Code Editor tab
       - Preview Button to jump to my preview pane tab
       - Save Button to write `world.json`
@@ -1270,752 +1272,28 @@ while (this.engine.running) {
 
 ---
 # SAVE / LOAD RUNTIME STATE
-Saved:
-* Actor positions
-* Actor data
-* Behavior.serialize()
-* Sprite/Sound playback states
-* World/global flags
-* Parent relationships
 
-Load:
-1. Load world.json
-2. Load save.json
-3. Reinstantiate runtime
-4. Apply state
+The game runs in a webpage without a backend.
+Therefore, there must be a strategy to save state using the browser's `localStorage`.
+
+TODO: Options To Consider:
+- save entire root `Actor` instance graph hierarchy to `localStorage` (TODO: is there enough space?  what's our limit?).  Only save state relevant to gameplay, Some state is not worth saving out, like the exact animation frame.
+- add a generic "save" `Behavior` only to those Actors we want to save, which uses `localStorage`
+- mark selected data fields in `Actor` and `Behavior` for save
+- allow the user to download a save file, which they can upload to restore (not ideal, forces them to deal with files on mobile)
+
+---
+# TODO: QUESTIONS to INVESTIGATE
+
+- on iOS mobile, they block audio unless you tap a button, how do we ensure that game audio plays, given the structure above?
+
+- Def system might be too unweildly, granular, spread out.
+  - Should we ALSO allow inline defs in the Asset instance as well?   if so, then we'd want a way to embed the exact same `<Asset>Def` into the `def: {...}` parameter of an Asset instance, right?   same loader for both.  defs would always be registered in the corresponding definition registry by their id (or GUID if no id given).
+  - This would mean that Defs can be
+    1. inline in the Asset (no reuse)
+    2. inline in the Def (reuse by all Assets in that one `world.json`)
+    3. on the filesystem (reuse by multiple `world.json`'s).  Incremental levels of reuse here.
+  - Where best to update the above spec, with this idea?     
 
 ---
 # END SPEC v1.0
-
-
-
-
-
-
-
-
-
-# ##############################################################################
-
-
-
-
-
-
-
-
-
-## 1. SpriteDef Examples
-
-```json
-{
-  "spriteDefs": {
-    "heroSprite": {
-      "image": "assets/sprites/hero.png",
-      "frameWidth": 16,
-      "frameHeight": 16,
-
-      "states": {
-        "idle": 0,
-        "walk": 1,
-        "attack": 2
-      },
-
-      "frameRateHz": 8,
-      "direction": "forward",
-
-      "ignoreColors": ["#000000", "#ff00ff"],
-      "boundingBox": { "x1": 2, "y1": 2, "x2": 13, "y2": 15 }
-    },
-
-    "slimeSprite": {
-      "image": "assets/sprites/slime.png",
-      "frameWidth": 16,
-      "frameHeight": 16,
-
-      "states": {
-        "idle": 0,
-        "hop": 1
-      },
-
-      "frameRateHz": 4,
-      "direction": "pingpong",
-      "ignoreColors": ["#000000"]
-    }
-  }
-}
-```
-
-Notes:
-
-* `states` maps state names → row indices
-* `ignoreColors` supports pixel-precise collision
-* `boundingBox` is in sprite pixel space
-
----
-
-## 2. MapDef Examples
-
-```json
-{
-  "mapDefs": {
-    "overworld": {
-      "tileImage": "assets/tiles/overworld.png",
-      "tileWidth": 16,
-      "tileHeight": 16,
-
-      "collisionIgnoreColors": ["#000000"],
-
-      "chunks": [
-        {
-          "x": 0,
-          "y": 0,
-          "width": 64,
-          "height": 64,
-          "tiles": [
-            [ 1, 1, 1, 1, 1, 1, 1, 1 ],
-            [ 1, 2, 2, 2, 2, 2, 2, 1 ],
-            [ 1, 2, 3, 3, 3, 3, 2, 1 ],
-            [ 1, 2, 3, 4, 4, 3, 2, 1 ],
-            [ 1, 2, 3, 3, 3, 3, 2, 1 ],
-            [ 1, 2, 2, 2, 2, 2, 2, 1 ],
-            [ 1, 1, 1, 1, 1, 1, 1, 1 ]
-          ]
-        }
-      ]
-    },
-
-    "dungeon1": {
-      "tileImage": "assets/tiles/dungeon.png",
-      "tileWidth": 16,
-      "tileHeight": 16,
-      "collisionIgnoreColors": ["#000000"],
-
-      "chunks": [
-        {
-          "x": 0,
-          "y": 0,
-          "width": 32,
-          "height": 32,
-          "tiles": [ /* big 2D array of tile indices */ ]
-        }
-      ]
-    }
-  }
-}
-```
-
-Notes:
-
-* `chunks` are positioned in tile coordinates via `x`, `y`.
-* `collisionIgnoreColors` is used at load time to precompute per-tile solidity.
-
----
-
-## 3. SoundDef Examples
-
-```json
-{
-  "soundDefs": {
-    "coinPickup": {
-      "path": "assets/sounds/coin.wav",
-      "pool_size": 8,
-      "spatial": true,
-      "falloff": "linear"
-    },
-
-    "playerHit": {
-      "path": "assets/sounds/player_hit.wav",
-      "pool_size": 4,
-      "spatial": true,
-      "falloff": "linear"
-    },
-
-    "ambientWind": {
-      "path": "assets/sounds/wind_loop.ogg",
-      "pool_size": 1,
-      "spatial": false
-    }
-  }
-}
-```
-
-Notes:
-
-* `pool_size` is the pool per **Sound**, duplicated per bound Actor.
-* `spatial: true` = distance attenuation via ListenerBehavior.
-* `spatial: false` = no attenuation (ambient).
-
----
-
-## 4. ActorDef + Actor Examples
-
-### ActorDef section
-
-```json
-{
-  "actorDefs": {
-    "player": {
-      "spriteDef": "heroSprite",
-
-      "behaviors": [
-        "playerControl",
-        "inventory",
-        "playerHealth"
-      ],
-
-      "data": {
-        "maxHealth": 10,
-        "moveSpeed": 60,
-        "faction": "hero"
-      },
-
-      "sounds": {
-        "hit": "playerHit"
-      }
-    },
-
-    "enemySlime": {
-      "spriteDef": "slimeSprite",
-
-      "behaviors": [
-        "slimeAI",
-        "enemyHealth"
-      ],
-
-      "data": {
-        "maxHealth": 3,
-        "moveSpeed": 40,
-        "faction": "enemy"
-      },
-
-      "sounds": {
-        "hit": "slimeHit"
-      }
-    },
-
-    "coin": {
-      "spriteDef": "coinSprite",
-
-      "behaviors": [
-        "pickupItem"
-      ],
-
-      "data": {
-        "value": 1
-      },
-
-      "sounds": {
-        "pickup": "coinPickup"
-      }
-    }
-  }
-}
-```
-
-Notes:
-
-* `data` in ActorDef are default fields; Actors can override.
-* `sounds` maps semantic names → SoundDef names (optional, but nice).
-
-### Actor objects in the world
-
-```json
-{
-  "world": {
-    "def": "worldActorDef",
-    "id": "worldRoot",
-
-    "mapDef": "overworld",
-
-    "behaviors": [
-      "worldContainer",
-      "collisionSystem",
-      "camera",
-      "spatialHash",
-      { "game": { "startMap": "overworld" } },
-      "listener"   // sets engine.listenerPosition
-    ],
-
-    "actors": [
-      {
-        "def": "player",
-        "id": "player",
-        "x": 80,
-        "y": 120,
-        "data": {
-          "health": 10
-        },
-        "tags": ["player", "controllable"]
-      },
-
-      {
-        "def": "enemySlime",
-        "id": "slime_001",
-        "x": 160,
-        "y": 140,
-        "data": {
-          "maxHealth": 5   // override default
-        },
-        "tags": ["enemy"]
-      },
-
-      {
-        "def": "coin",
-        "id": "coin_001",
-        "x": 200,
-        "y": 100,
-        "tags": ["pickup", "gold"]
-      }
-    ]
-  }
-}
-```
-
-Notes:
-
-* `world` is an Actor with its own `def` (e.g. `"worldActorDef"`).
-* `world.actors` is a pure data list that the Game behavior / worldContainer behavior will instantiate into runtime Actors.
-
----
-
-## 5. Behavior JS Examples
-
-### 5.1 PlayerControlBehavior
-
-```js
-// behaviors/playerControl.js
-class PlayerControl extends Behavior {
-    handle(trigger, ...args) {
-        switch (trigger) {
-            case "update":
-                this.updateMovement(args[0]); // dt
-                break;
-
-            case "moveLeftDown":
-                this.moveLeft = true;
-                break;
-            case "moveLeftUp":
-                this.moveLeft = false;
-                break;
-
-            case "moveRightDown":
-                this.moveRight = true;
-                break;
-            case "moveRightUp":
-                this.moveRight = false;
-                break;
-
-            case "moveUpDown":
-                this.moveUp = true;
-                break;
-            case "moveUpUp":
-                this.moveUp = false;
-                break;
-
-            case "moveDownDown":
-                this.moveDown = true;
-                break;
-            case "moveDownUp":
-                this.moveDown = false;
-                break;
-        }
-    }
-
-    updateMovement(dt) {
-        const data = this.actor.data;
-        const speed = data.moveSpeed ?? 60;
-        let dx = 0;
-        let dy = 0;
-
-        if (this.moveLeft)  dx -= speed * dt;
-        if (this.moveRight) dx += speed * dt;
-        if (this.moveUp)    dy -= speed * dt;
-        if (this.moveDown)  dy += speed * dt;
-
-        this.actor.localX += dx;
-        this.actor.localY += dy;
-
-        if (dx !== 0 || dy !== 0) {
-            this.actor.emitTrigger("playerMoved", this.actor.localX, this.actor.localY);
-        }
-    }
-}
-
-engine.registerBehavior("playerControl", PlayerControl);
-```
-
----
-
-### 5.2 InventoryBehavior
-
-```js
-// behaviors/inventory.js
-class Inventory extends Behavior {
-    constructor(actor, world, config) {
-        super(actor, world, config);
-        this.max = config?.max ?? 16;
-        this.items = [];
-    }
-
-    serialize() {
-        return { items: this.items.slice(0) };
-    }
-
-    deserialize(data) {
-        this.items = data.items ?? [];
-    }
-
-    handle(trigger, ...args) {
-        switch (trigger) {
-            case "pickup":
-                this.tryPickup(args[0]); // itemActor
-                break;
-            case "useItem":
-                this.useItem(args[0]); // slot index
-                break;
-        }
-    }
-
-    tryPickup(itemActor) {
-        if (this.items.length >= this.max) return;
-        this.items.push(itemActor.id);
-
-        // remove from world container, hide sprite, etc.
-        this.world.emitTrigger("removeActor", itemActor);
-    }
-
-    useItem(slotIndex) {
-        const id = this.items[slotIndex];
-        if (!id) return;
-
-        // let some other behavior handle "useItemOnSelf"
-        this.actor.emitTrigger("useItemOnSelf", id);
-    }
-}
-
-engine.registerBehavior("inventory", Inventory);
-```
-
----
-
-### 5.3 Simple SlimeAI Behavior
-
-```js
-// behaviors/slimeAI.js
-class SlimeAI extends Behavior {
-    constructor(actor, world, config) {
-        super(actor, world, config);
-        this.direction = 1;
-        this.timer = 0;
-    }
-
-    handle(trigger, ...args) {
-        if (trigger === "update") {
-            const dt = args[0];
-            this.timer += dt;
-            if (this.timer > 2.0) {
-                this.direction *= -1;
-                this.timer = 0;
-            }
-
-            const speed = this.actor.data.moveSpeed ?? 40;
-            this.actor.localX += this.direction * speed * dt;
-        }
-    }
-}
-
-engine.registerBehavior("slimeAI", SlimeAI);
-```
-
----
-
-## 6. UIDef + `<InGameUI>` Example
-
-### UIDef in world.json
-
-```json
-{
-  "uiDefs": {
-    "defaultUI": {
-      "include": "ui/defaultUI.js"
-    }
-  },
-
-  "ui": {
-    "def": "defaultUI"
-  }
-}
-```
-
-### ui/defaultUI.js
-
-```js
-// ui/defaultUI.js
-class GameUI extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot.innerHTML = `
-            <style>
-              .hud { position: fixed; top: 8px; left: 8px; color: white; }
-              .inventory { position: fixed; bottom: 8px; left: 8px; color: white; }
-              button { margin-right: 4px; }
-            </style>
-            <div class="hud">
-              Health: <span id="health">-</span>
-            </div>
-            <div class="inventory">
-              <button id="useSlot0">Use Slot 0</button>
-              <button id="useSlot1">Use Slot 1</button>
-            </div>
-        `;
-    }
-
-    initialize(engine, world, rootActor) {
-        this.engine = engine;
-        this.world = world;
-        this.rootActor = rootActor;
-
-        const use0 = this.shadowRoot.getElementById("useSlot0");
-        const use1 = this.shadowRoot.getElementById("useSlot1");
-        use0.addEventListener("click", () => {
-            this.rootActor.emitTrigger("useItem", 0);
-        });
-        use1.addEventListener("click", () => {
-            this.rootActor.emitTrigger("useItem", 1);
-        });
-
-        this.healthSpan = this.shadowRoot.getElementById("health");
-    }
-
-    update(dt) {
-        // example: read player health each frame (could be optimized with events)
-        const game = this.world.get_behavior("game");
-        const player = game.findActorById("player");
-        if (player && this.healthSpan) {
-            this.healthSpan.textContent = player.data.health ?? "?";
-        }
-    }
-}
-
-customElements.define("InGameUI", GameUI);
-
-// register with engine's UIDef loader if needed
-engine.registerUIDef("defaultUI", GameUI);
-```
-
----
-
-## 7. EditorDef + `<world-editor>` Example
-
-### EditorDef in world.json
-
-```json
-{
-  "editorDefs": {
-    "defaultEditor": {
-      "include": "editor/mainEditor.js"
-    }
-  },
-
-  "editor": {
-    "def": "defaultEditor"
-  }
-}
-```
-
-### editor/mainEditor.js
-
-```js
-// editor/mainEditor.js
-class WorldEditor extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: "open" });
-        this.shadowRoot.innerHTML = `
-          <style>
-            .layout { display: grid; grid-template-columns: 220px 1fr 300px; height: 100vh; }
-            .sidebar { border-right: 1px solid #444; overflow-y: auto; }
-            .center { border-right: 1px solid #444; position: relative; }
-            .rightbar { overflow-y: auto; }
-          </style>
-          <div class="layout">
-            <div class="sidebar">
-              <file-selector id="files"></file-selector>
-            </div>
-            <div class="center">
-              <engine-preview id="preview"></engine-preview>
-            </div>
-            <div class="rightbar">
-              <sprite-editor id="spriteEditor"></sprite-editor>
-              <actor-editor id="actorEditor"></actor-editor>
-              <code-editor id="codeEditor"></code-editor>
-            </div>
-          </div>
-        `;
-    }
-
-    initialize(projectWorldJson, backendAPI) {
-        this.projectWorldJson = projectWorldJson;
-        this.backendAPI = backendAPI;
-
-        const fileSelector = this.shadowRoot.getElementById("files");
-        const preview = this.shadowRoot.getElementById("preview");
-        const spriteEditor = this.shadowRoot.getElementById("spriteEditor");
-        const actorEditor = this.shadowRoot.getElementById("actorEditor");
-        const codeEditor = this.shadowRoot.getElementById("codeEditor");
-
-        // wire up events, e.g.:
-        fileSelector.addEventListener("fileSelected", (e) => {
-            const path = e.detail.path;
-            // open in appropriate editor
-        });
-
-        preview.loadWorld(projectWorldJson);
-    }
-}
-
-customElements.define("world-editor", WorldEditor);
-
-// registered via editorDefs loader
-engine.registerEditorDef("defaultEditor", WorldEditor);
-```
-
----
-
-## 8. Full Example `world.json` (Minimal but End-to-End)
-
-Here’s a compact but coherent example tying it all together:
-
-```json
-{
-  "spriteDefs": {
-    "heroSprite": {
-      "image": "assets/sprites/hero.png",
-      "frameWidth": 16,
-      "frameHeight": 16,
-      "states": { "idle": 0, "walk": 1 },
-      "frameRateHz": 8,
-      "direction": "forward",
-      "ignoreColors": ["#000000"],
-      "boundingBox": { "x1": 2, "y1": 2, "x2": 13, "y2": 15 }
-    },
-    "slimeSprite": {
-      "image": "assets/sprites/slime.png",
-      "frameWidth": 16,
-      "frameHeight": 16,
-      "states": { "idle": 0, "hop": 1 },
-      "frameRateHz": 4,
-      "direction": "pingpong",
-      "ignoreColors": ["#000000"]
-    }
-  },
-
-  "mapDefs": {
-    "overworld": {
-      "tileImage": "assets/tiles/overworld.png",
-      "tileWidth": 16,
-      "tileHeight": 16,
-      "collisionIgnoreColors": ["#000000"],
-      "chunks": [
-        {
-          "x": 0,
-          "y": 0,
-          "width": 8,
-          "height": 7,
-          "tiles": [
-            [1,1,1,1,1,1,1,1],
-            [1,2,2,2,2,2,2,1],
-            [1,2,3,3,3,3,2,1],
-            [1,2,3,4,4,3,2,1],
-            [1,2,3,3,3,3,2,1],
-            [1,2,2,2,2,2,2,1],
-            [1,1,1,1,1,1,1,1]
-          ]
-        }
-      ]
-    }
-  },
-
-  "soundDefs": {
-    "coinPickup": {
-      "path": "assets/sounds/coin.wav",
-      "pool_size": 8,
-      "spatial": true,
-      "falloff": "linear"
-    }
-  },
-
-  "actorDefs": {
-    "worldActorDef": {
-      "mapDef": "overworld",
-      "behaviors": [
-        "worldContainer",
-        "collisionSystem",
-        "camera",
-        "spatialHash",
-        "listener",
-        { "game": { "startMap": "overworld" } }
-      ]
-    },
-
-    "player": {
-      "spriteDef": "heroSprite",
-      "behaviors": ["playerControl", "inventory", "playerHealth"],
-      "data": { "maxHealth": 10, "moveSpeed": 60 },
-      "sounds": { "pickup": "coinPickup" }
-    },
-
-    "enemySlime": {
-      "spriteDef": "slimeSprite",
-      "behaviors": ["slimeAI", "enemyHealth"],
-      "data": { "maxHealth": 3, "moveSpeed": 40 }
-    }
-  },
-
-  "uiDefs": {
-    "defaultUI": {
-      "include": "ui/defaultUI.js"
-    }
-  },
-
-  "editorDefs": {
-    "defaultEditor": {
-      "include": "editor/mainEditor.js"
-    }
-  },
-
-  "world": {
-    "def": "worldActorDef",
-    "id": "worldRoot",
-
-    "actors": [
-      {
-        "def": "player",
-        "id": "player",
-        "x": 80,
-        "y": 120,
-        "data": { "health": 10 },
-        "tags": ["player"]
-      },
-      {
-        "def": "enemySlime",
-        "id": "slime_001",
-        "x": 160,
-        "y": 140,
-        "tags": ["enemy"]
-      }
-    ]
-  },
-
-  "ui": {
-    "def": "defaultUI"
-  },
-
-  "editor": {
-    "def": "defaultEditor"
-  }
-}
-```
-
