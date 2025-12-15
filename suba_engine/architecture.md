@@ -22,16 +22,15 @@ A Game Engine for Web Browser.
       - ... or by copying an existing editor definition and modifying it.
   - Runtime game is created inside index.html with a single <game data="world.json"></game> html element
 
-```
-TechStack:   JavaScript + HTML + CSS, no or minimal dependencies
-Renderer:    Canvas 2D + HTML overlay
-Editor:      Pluggable Editable Web Components + Backend FS abstraction
-Philosophy:  Data-driven, Behavior-centric, JSON Defs
-Project:     world.json is the ENTIRE game (with ingame UI and editor)
-Code Std:    spaces instead of tabs; 2 spaces per tab; curlybrace on same line as conditional;
-             requirements driven; keep it simple stupid; refactor towards simplicity as you go along;
-             CamelCase classes/structs, camelCase functions, snake_case variables, _private variables, ALL_CAPS enums, if () conditionals, for () and while () loops; func( arg, arg2, arg3 ) functions;
-```
+
+
+| **TechStack**:   | JavaScript + HTML + CSS, no or minimal dependencies |
+| **Renderer**:    | Canvas 2D + HTML overlay |
+| **Editor**:      | Pluggable Editable Web Components + Backend FS abstraction |
+| **Philosophy**:  | Data-driven, Behavior-centric, JSON Defs |
+| **Project**:     | world.json is the ENTIRE game (with ingame UI and editor) |
+| **Code Std**:    | spaces instead of tabs; 2 spaces per tab; curlybrace on same line as conditional; requirements driven; keep it simple stupid; refactor towards simplicity as you go along; CamelCase classes/structs, camelCase functions, snake_case variables, _private variables, ALL_CAPS enums, if () conditionals, for () and while () loops; func( arg, arg2, arg3 ) functions; |
+
 
 
 
