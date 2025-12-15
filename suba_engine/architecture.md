@@ -23,7 +23,7 @@ A Game Engine for Web Browser.
   - Runtime game is created inside index.html with a single <game data="world.json"></game> html element
 
 
-
+| ---------------- | ------------- |
 | **TechStack**:   | JavaScript + HTML + CSS, no or minimal dependencies |
 | **Renderer**:    | Canvas 2D + HTML overlay |
 | **Editor**:      | Pluggable Editable Web Components + Backend FS abstraction |
