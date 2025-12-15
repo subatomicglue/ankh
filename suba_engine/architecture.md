@@ -38,27 +38,26 @@ A Game Engine for Web Browser.
 ---
 # CORE DESIGN PRINCIPLES
 
-```
 1. Asset Definitions:  Assets are first defined as "Defs"
-   ActorDef, SpriteDef, MapDef, SoundDef, UIDef, EditorDef.
-   Serve as prototypes (templates) for creating runtime Asset instances of those types.
+   - ActorDef, SpriteDef, MapDef, SoundDef, UIDef, EditorDef.
+   - Serve as prototypes (templates) for creating runtime Asset instances of those types.
 
 2. Asset instances:  All runtime objects (Actor, Map, Sprite, Sound, UI, Editor)
-   implicitly instantiate an AssetDefinition, by refering to their Def via:  "def": "<DefName>".
+   - implicitly instantiate an AssetDefinition, by refering to their Def via:  "def": "<DefName>".
 
 3. Asset Naming:  We'll use "Def", but not "instance" inside world.json schema,
-   instance types are short/simple in the json text (Actor, Map, Sprite, Sound, UI, Editor).
-   def types are longer in the json text (ActorDef, MapDef, SpriteDef, SoundDef, UIDef, EditorDef).
+   - instance types are short/simple in the json text (Actor, Map, Sprite, Sound, UI, Editor).
+   - def types are longer in the json text (ActorDef, MapDef, SpriteDef, SoundDef, UIDef, EditorDef).
 
 4. Actors hold state, which is used by behavior logic.
-   Behaviors hold both logic AND it's own state.  Behavior logic can use actor state as well.
-   Defs hold immutable configuration.
+   - Behaviors hold both logic AND it's own state.  Behavior logic can use actor state as well.
+   - Defs hold immutable configuration.
    
 5. Triggers are the universal communication mechanism.
-   Actor has emitTrigger( name, params ), which dispatches down the hierarchy to child behavior(s) and actor(s).
+   - Actor has emitTrigger( name, params ), which dispatches down the hierarchy to child behavior(s) and actor(s).
 
 6. Engine input and In Game UI both emit triggers into the root Actor.
-   Behaviors can emit triggers into other actors
+   - Behaviors can emit triggers into other actors
 
 7. world.json defines the entire project:
    - asset defs and instances
@@ -67,22 +66,22 @@ A Game Engine for Web Browser.
    - in game ui
 
 8. Editor and In Game UI are Web Components (just javascript/html/css code)
-   defined via world.json's UIDef and EditorDef
-   a world.json has one editor and one ui, set by "editor" and "ui" (which refers to EditorDef and UIDef)
+   - defined via world.json's UIDef and EditorDef
+   - a world.json has one editor and one ui, set by "editor" and "ui" (which refers to EditorDef and UIDef)
 
 9. One Reusable Loader in the world.json schema
-   looks like:  { include: "file.js" } or { inline: "javascript_code_goes_here()" }
-   which handles:
-    - include JS or JSON
-    - inline JS or JSON
+   - looks like:  { include: "file.js" } or { inline: "javascript_code_goes_here()" }
+   - which handles:
+     - include JS or JSON
+     - inline JS or JSON
 
 10. Everything is extensible:
-    new Def types can be added easily.
-    editor can be replaced
-    ingame ui can be replaces
-    behaviors allow new custom logic
-    we'll build libraries of reusable components so building these are easy, but some editor/ingameui/behaviors will be very game specific, of course.
-```
+    - new Def types can be added easily.
+    - editor can be replaced
+    - ingame ui can be replaces
+    - behaviors allow new custom logic
+    - we'll build libraries of reusable components so building these are easy, but some editor/ingameui/behaviors will be very game specific, of course.
+
 
 
 
