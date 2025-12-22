@@ -33,7 +33,10 @@ A Game Engine for Web Browser.
 | **Code Std**:    | spaces instead of tabs; 2 spaces per tab; curlybrace on same line as conditional; requirements driven; keep it simple stupid; refactor towards simplicity as you go along; CamelCase classes/structs, camelCase functions, snake_case variables, _private variables, ALL_CAPS enums, if () conditionals, for () and while () loops; func( arg, arg2, arg3 ) functions; |
 
 
+# Conventions
 
+- `designer` is the user making the game design, setting up `world.json` 
+- AssetDef is used to generically talk about all asset types, there is no `Asset` or `AssetDef` types in this system (unless the engine needs to use a baseclass for some common code, but this will be hidden from the game `designer`)
 
 ---
 # CORE DESIGN PRINCIPLES
@@ -182,7 +185,7 @@ Asset definitions serve as templates (aka prototypes) that are used when spawnin
 
 ### Definition Schema:
 All Defs are defined in this way
-- `id` is optional, but must be UNIQUE (exception (or auto uniquify the name) if not unique; will get assigned a GUID if not supplied)
+- `id` is optional, but must be UNIQUE (exception thrown if not unique; will get assigned a unique GUID if not supplied)
 - `config` is mandatory
 ```
 "<AssetType>Def": { id: "<DefName>", "config": <config> }
@@ -204,6 +207,30 @@ ActorDef: {
 }
 ```
 
+### When `id` is missing - Auto Assigned GUIDs
+
+**Q:**  When the `assetDefLoader` auto-assigns an IDs with a new GUID, how do designers discover the new names so they can reference them later?
+**A:**  They Dont.   `id` wasn't given, there's no expectations.
+
+
+### Inline Definition Sources
+An `<AssetType>Def` can originate from three places, but the loader treats them identically:
+1. inline in the Asset
+  - where `def` can embed a full definition object typically without id (`{ config }`).
+  - Without `id` is only useful for immediate instance and ensures no other instance will try to use it.
+  - With `id` will register the instance with the global registry of definitions, and potentially another Asset could reference that `id`, then. 
+2. inline in the Def (reuse by all Assets in that one `world.json`)
+3. on the filesystem (reuse by multiple `world.json`'s).  Incremental levels of reuse here.
+
+Regardless of where the definition is discovered, `assetDefLoader` normalizes it (assigns GUIDs when id is missing) and registers it in the global definition registry for that type. Registration order follows file order, so referencing a def before it is encountered will still fail; designers should declare inline defs before they are consumed elsewhere.
+
+Benefit of registering the definition, is discovery, and inventory, for tooling to be able to list out all unique definitions in the system.
+
+### Runtime asset paths
+- `world.json` relative path will be specified to `<game data="world.json"></game>`
+- assets that are included from `world.json` will be relative to `world.json`, engine will parse off the path, and append to every asset included from `world.json`
+- asset includes are only ever fetched once, any subsequent references in `world.json` to that asset include will refer to the first one fetched.  Caching is described in `configLoader` below.
+
 ### Standardized "config" (configLoader):
 
 All `config` keys in the `world.json` are handled by the same common reusable `configLoader` codepath in the engine:
@@ -212,9 +239,9 @@ All `config` keys in the `world.json` are handled by the same common reusable `c
   "id": "<DefName>",
 
   // ... and then, one of the following types of "config":
-  "config": "path/to/file.<js or json>",      // include style config (configLoader checks for string matching path)
-  "config": "java_script_goes_here()",        // inline style config (configLoader checks for string !matching path)
-  "config": { ... JSON data definition ... }  // json style config (configLoader checks for object)
+  "config": "path/to/file.<js or json>",      // include-style config (configLoader checks for string matching assetpath pattern)
+  "config": "java_script_goes_here()",        // inline-style config (configLoader checks for string !matching assetpath pattern)
+  "config": { ... JSON data definition ... }  // json-style config (configLoader checks for object)
 }
 ```
 
@@ -226,20 +253,22 @@ function configLoader( definition_config ) {
   if (type definition_config == "string" && path_regex.test( definition_config )) {
     // get the codefile.js or datafile.json ready, store it back on top of definition.config
     const let code = fetch( `<urlprefix>/${definition_config}` )
-    return eval( code )
+    return (code && code.length > 2) ? (code.trim()[0] == '{' ? JSON.parse( code ) : eval( code )) : undefined
   }
 
   // inline style config
   else if (type definition_config == "string" && !path_regex.test( definition_config )) {
     // get the javascript code ready, store it back on top of definition.config
     const let code = definition_config
-    return eval( code )
+    return (code && code.length > 2) ? eval( code.trim() ) : undefined
   }
 
   // json style config
   else if (type definition_config == "object") {
     return definition_config
   }
+
+  return undefined; // did nothing.
 }
 ```
 
@@ -248,6 +277,8 @@ The reusable `configLoader` is used to resolve any `config` key inside the `worl
 definition.config_src = definition.config   // preserve source
 definition.config = configLoader( definition.config_src )
 ```
+This lends to asset Caching:
+- asset includes are only ever fetched once, any subsequent references in `world.json` to that same asset-include will refer to the first one fetched.  `definition.config_src` is the cache.  The `configLoader` will check if `definition.config_src` exists, and if so, use it, and if not, it'll do the asset fetch. 
 
 As illustrated above, we will generically use `config` for all Asset definitions, to allow users to perform either:
 - inline `config` editing (easy iteration)
@@ -336,13 +367,26 @@ AssetDef: {
 Asset:
 {
   "id": "slime004",
-  "def": "enemySlime",
+  "def": "enemySlime",               // or an inline AssetDef object, see below
   "deftype",                         // automatically set when instantiated, to the AssetDef
   "x": 120,
   "y": 200,
   "<datakey>": "<datavalue>"         // override any of the base ones
 }
 ```
+
+The def field accepts either the AssetDef's `id` identifier, or, an inline definition object for the AssetDef:
+```
+Asset:
+{
+  "id": "slime004",
+  "def": {
+    "id": "enemySlime-Alt",
+    "config": { ...full ActorDef config... }
+  }
+}
+```
+When an inline object is provided, the engine runs it through the same `assetDefLoader`, registers it globally (assigning a GUID if id is omitted), and then instantiates the resulting `def`. Other assets can reference that new `id` later as long as they appear *after* this inline `def` in `world.json`.
 
 
 
@@ -490,12 +534,19 @@ this.engine.actor   // the root "world" Actor
 this.getPos         // position of my Actor
 this.getLocalPos    // local position of my Actor
 this.setLocalPos    // modify the local position of my Actor
+this[key] = value;
+if (this[key)) { /* do things */ }
 ```
+
+### JS scope
+Scope is the entire engine, your behavior can ruin things.
+Use this to limit your behavior code's actions to only the data exposed to your behavior
+
+WARNING: be careful!  you can footgun yourself here (ow!).
 
 ### Triggers
 See Behavior schema above for defining custom triggers.
 See Trigger section for engine generated triggers that you should expect to emit into your Behaviors.
-
 
 
 ---
@@ -804,6 +855,7 @@ The `editor-backend.js` when `https://localhost:8080` is loaded, displays a page
   - 2 panes:
     - 1 big pane with 2 sub tabs:
       - Code Editor for the selected `EditorDef` or `InGameUIDef`
+        - A HTML web component that implements the `<JavascriptCodeEditor>` HTML element
       - preview pane (shows the active `<GameProjectEditor></GameProjectEditor>` or `<InGameUI></InGameUI>` being edited)
         - displays the `InGameUI` as defined by `InGameUIDef` in the active `world.json`, as the `<InGameUI>` html element
         - displays the `GameProjectEditor` as defined by `EditorDef` in the active `world.json`, as the `<GameProjectEditor>` html element
@@ -905,13 +957,12 @@ or
       - Controls
         - play and stop buttons, trigger buttons (one per named trigger in the Actor's Behaviors)
     - data pane
-      - listview with list of all `SoundDef`s in `world.json`
-      - `SpriteDef` editor (datadriven by the base `SpriteDef` config structure), for example:
-        - Upload new sprite image to assets backend
-        - Select a sprite image from assets backend, and set it into the `SpriteDef`
-        - all other fields from the the base `SpriteDef` config structure
+      - listview with list of all `ActorDef`s in `world.json`
+      - `ActorDef` editor (datadriven by the base `ActorDef` config structure)
+      - `BehaviorDef` editor (datadriven by the base `BehaviorDef` config structure), for example:
+        - shows the top-level structure of a `BehaviorDef`
   - Saves to `world.json` definitions
-  - Reuse the web-component `<JavaScriptEditor>` code editor for JavaScript
+  - Reuse the web-component `<JavascriptCodeEditor>` code editor for JavaScript
   - Edit the BehaviorDef fields, for example:
     - Create triggers, edit code for the trigger
 - Sprite Definition Editor
@@ -1004,7 +1055,116 @@ or
       - Preview Button to jump to my preview pane tab
       - Save Button to write `world.json`
   - Saves to `world.json` definitions
-
+- World Editor (world Actor Placement and Editing)
+  - **Purpose:** A unified workspace for laying out the `Actor` hierarchy defined under `world.json` root `actor`.
+  - 2 Panes (left and right):
+    - **Viewport pane (left)**:
+      - `WorldViewport`: a black viewport renders the static (initialization-time) game world using the engine runtime.  (`<WorldViewport>` as a reusable web component)
+      - pan: right-drag; zoom: mousewheel/pinch.
+      - play button below the Viewport replaces the viewport with a `<game>` for play testing
+      - stop button below the Viewport replaces the `<game>` with the world editing viewport
+    - **Data pane (right)**: visually stacked editors that react to the current selection.
+      - Default Top section:
+        - **ActorDef list**:  listview of all `ActorDef`s in the active `world.json`, showing all `<AssetType>Def` lists, with search/ filter
+        - **Actor Graph**: hierarchical listview of all `Actor` instances in `world.json` root `actor`-graph, with search/filter.
+        - drag and drop is used to move inline `def` from the instance to the `world.json` `<AssetType>Def` list, and vice-versa.
+          - move from the `def` Asset instance:  replaces that Asset instance's `def` with the `id`; if no `id` existed yet, generate a GUID, and use that.
+          - move into the `def` Asset instance:  replaces that Asset instance's inline `def` using the item's data from the `<AssetType>Def` list.
+        - edit of an AssetDef's `id` updates all Asset instance `def` references (in the actor-graph) to that new `id` name.
+        - resize:  can drag-expand the bottom border of each editor-widget to be taller (vert resize as a reusable web component that every data pane widget can use)
+      - **Below**: contextual editors that appear as you select-drill into instances/defs/fields; each editor can spawn child editors beneath it (accordion style).
+        - TODO: in code, we have a decision whether to add as a child or as a sibling.   child may be easier...
+        - resize:  can drag-expand the bottom border of each editor-widget to be taller (vert resize as a reusable web component that every data pane widget can use)
+    - **...with a reactive layout**:
+      - panes fit the browser reactively, if too narrow (e.g. on mobile) then left pane is on top, and right pane is on bottom.
+      - divider between the panes is positionable, which can resize both panes at once.
+  - New Placement workflow:
+    1. Click explicit mode toggle “Place Actor” button. (found in the floating pills)
+    2. Optionally toggle “snap to parent” button. (found in the floating pills), if unchecked, new actors always attach under the root `Actor` regardless of what’s selected, which prevents accidental deep nesting.
+    3. Select an `ActorDef` in the right-hand datapane listview.
+    4. Optionally select an `Actor` instance in the right-hand datapane hierarchical listview. (if selected, new placed `Actor` will become a child under this `Actor`)
+    5. Clicking the `WorldViewport`, receives the selected data; and x,y world position clicked on (mouse x,y position is translated into "game world" x,y)
+    6. A new `Actor` instance data (derived from the selected `ActorDef` data) is appended to `world.json` under the selected `actor`'s children (or under root if no `Actor` selection), setting the x,y data for that `Actor` instance.
+    7. The new instance appears immediately; undo/redo integrates with the editor’s history stack.
+    8. After a placement, stay in placement mode but show a floating “Done” pill so designers can exit quickly (handy on mobile where hitting ESC isn’t an option).
+  - Copy/Paste Placement workflow:
+    1. Select an `Actor` instance in either a. the right-hand datapane hierarchical listview, or, b. from the `WorldViewport`.
+    2. Press ctrl-c to copy, or long-press on the `Actor` to copy, or use on-screen copy/paste buttons. (found in the floating pills)
+    3. Upon paste (ctrl-v, or paste button pill), set mode status "place actor".  Show a ghost actor following the cursor/finger. The next tap drops it and sets the world x/y.  cancel the mode status "place actor" with escape or "x" on the status
+      - the `WorldViewport` receives the copied data; and x,y world position of the mouse cursor or tap location
+      - mouse/tap x,y position is translated into "game world" x,y
+    4. A new `Actor` instance data (derived from the selected `ActorDef` data) is appended to `world.json` as a sibling of the selected `Actor` instance, setting the x,y data for that `Actor` instance offset in x by the bounding box width (they might stack up on top of each other, that's ok).
+    5. The new instance appears immediately; undo/redo integrates with the editor’s history stack.
+  - Selection workflow:
+    1. Clear the ActorDef list selection (or press Esc) to leave placement mode.
+    2. Click any Actor in the viewport to select/focus it. The selection outline highlights in-scene.
+    3. Data pane updates with:
+      - In the actor-graph hierachical listview, shows the focused `Actor` highlighted and scrolled into view.
+      - Below that we've added an editor card to represent the selected `Actor` instance (shows def, position, custom data, child asset references).
+      - Upon selection of sub features (def, child assets, data fields) of that `Actor` instance, then, more Nested editors will appear under that card, for those linked assets (Sprite instances, Behavior instances, etc.). Clicking a child drills deeper, pushing another editor card under the parent.
+      - Links back to source `ActorDef` so designers can jump between instance tweaks and definition edits.
+  - Editing model:
+    - Each editor widget edits JSON data only; it doesn’t execute code directly.
+    - The widget is given the JSON pointer (`world.json/<path>`) so saves route to the correct spot (inline instance, inline def, or include file).
+    - Undo/redo spans all widgets so “drill-down edits” roll back cohesively.
+  - Generic `<asset-editor>`:
+    - Provide one reusable `<asset-editor>` component that accepts:
+      - data: the current JSON payload.
+      - schema: field definitions (labels, types, validation, nested repeaters). Each asset type (Actor, Sprite, Map, Sound, Behavior, UIDef, EditorDef) supplies its schema via a registry so the UI   - adapts automatically.
+      - onChange callback that emits the new JSON plus metadata indicating whether the payload should be written inline or to an include file.
+    - Specialized editors (e.g., sprite image picker, tilemap painter) plug into slots defined by the schema so high-fidelity tools coexist with the generic form.
+    - Benefits: single code path for validation, consistent UX, easier maintenance as new asset types arrive.
+  - Here’s the full set of UI/web components the spec now implies, grouped by role. Everything lives under the World Editor umbrella so they can be re-used in other tabs.
+    - Core World Editor Shell
+      - `world-editor`: owns the tab, orchestrates viewport/data pane, undo/redo.
+      - `world-viewport`: renders runtime scene, handles pan/zoom, placement ghost, selection outline.
+      - `actor-pills-toolbar`: floating controls (Place Actor, Snap to Parent, copy/paste buttons, “Done” chip, status indicator).
+      - `actor-hierarchy-list`: tree view of the current world.json.actor hierarchy (select, expand/collapse, drag/drop reorder).
+      - `actordef-list`: flat list of all ActorDefs; supports search/filter.
+      - `editor-card-stack`: container that shows stacked contextual editors as you drill down (push/pop cards).
+    - Generic Editing Infrastructure
+      - `<asset-editor>` (generic data editing form). Which auto-configures based on schemas for the following:
+        - `ActorDef`
+        - `Actor` instance
+        - `BehaviorDef`
+        - `Behavior` instance (instance overrides, data fields)
+        - `SpriteDef`
+        - `Sprite` instance
+        - `MapDef`
+        - `Map` instance (chunk positions, enable flags)
+        - `SoundDef`
+        - `Sound` instance
+        - `InGameUIDef`
+        - `InGameUI` instance
+        - `GameProjectEditorDef`
+        - `GameProjectEditor` instance
+      - Each schema should describe
+        - primitive fields (bool, number (with min/max), string, options list, key/value pair(s))
+        - child Asset instance lists (`Behaviors`, `Sprites`, etc.)
+        - optionally if a special editor is needed upon click, e.g.
+          - `Behavior` `triggers` editor (key/value pairs), where clicking the trigger key's value pops up a `javascript-code-editor`, which edits the string field for that trigger key's value.
+          - `Map`'s `maptile` editor (string type), clicking the value pops up a
+          - `Sound` file (string type), clicking raises a `file-requestor` with (`wav`|`m4a`|`mp3`) extension filter
+      - `<asset-editor>` provides a callback hook on change, so that changes get propagated to the right location:
+        - in the asset vs in the definitions
+        - inline vs assetfilesys
+    - Specialized / One-off Editors
+      - `file-requestor`: pops up a dialog with the file, certain types will have a preview available (audio or image).
+        - configure with extensions to filter from the backend `<file-requestor exts="['mp3', 'm4a', 'wav']">`
+      - `javascript-code-editor`: existing component used for Behavior, UI, and Editor defs (syntax highlighting, save hooks).
+      - `sprite-state-preview`: canvas preview with play/stop controls, frame/state selector.
+      - `sprite-image-picker`: chooser for sprite sheets from the asset backend, shows thumbnails, enforces frame dimensions.
+      - `map-chunk-editor`: provides tilemap painting, chunk creation/deletion, per-chunk transform editing.
+      - `tilepicker-panel:` palette of tiles taken from the map’s tileset image (works inside the chunk editor).
+      - `sound-preview-panel`: play/stop buttons, waveform visualization, gain/falloff sliders tied to SoundDef.
+      - `asset-reference-picker`: generic dialog for selecting existing defs/instances when wiring child assets (used inside `Actor` editor for choosing child `BehaviorDef`/`SpriteDef` references).
+      - `inline-include-toggle`: small widget that lets designers flip between inline JSON and include file storage for a particular sub-object.
+      - Utility/Support Components
+        - `selection-overlay:` draws outlines/bounding boxes for the currently selected Actor(s) in the viewport.
+        - `ghost-actor-preview`: appears during placement/copy workflows; follows pointer and snaps to grid when needed.
+        - `undo-redo-controls`: toolbar or keyboard handler integrated with the world editor history stack.
+        - `status-toast` / `guidance-banner`: to notify users (e.g., “Placement mode active”, “Snap-to-parent off”).
+        - `asset-schema-registry`: not a visual component but a module providing schema definitions to `<asset-editor>` so it can render the correct controls per asset type.
 
 
 
@@ -1053,7 +1213,7 @@ this.engine.actor.emitTrigger( "lateUpdate", dt );
 ```
 
 ### Standard Triggers - emitted from Engine Collision:
-When actors collide, the Collision Enginer will emit the following events onto the 2 `Actor`s
+When actors collide, the Collision Engine will emit the following events onto the 2 `Actor`s
 ```
 actor.emitTrigger( "collide", ...data... )
 actor.emitTrigger( "collide_start", ...data... )
@@ -1095,7 +1255,17 @@ Details:
       - c. contining collidable pixels
   - **collidable pixels**: the `Map` asset has a list of colors to ignore
 - `Actor` auto computes it's own bounding box from it's children
+  - **bounding box**: returns the Union of all children's bounding boxes
+  - **collidable pixels**: iterates through the children in order, performing pixel collision, first hit of opaque pixel, returns positive for the collision.
 
+### Collision Direction
+- In many cases, a direction vector upon collision is nice to have for physical interactions
+  - **bounding box** alone, the side of the collision can return a normalized up/down/left/right direction vector.
+  - **collidable pixels**:  
+    - Variants we could expose
+      - Option[fast]: the vector returned can be a normalized vector from the centroid of the bounding box, to the first pixel collided.
+      - Option[accuracy]: A more accurate test would be to use:  the centroid/average of all pixels collided, instead of the first pixel collided.
+      - Option[constrain]: Could ultimately constrain/snap the normalized vector to up/down/left/right direction vector
 
 
 ---
@@ -1240,6 +1410,36 @@ Handled by the browser.   individual `Sound` instances manage their own pools, a
 
 `Sound` instances utilize `update()` to trigger themselves, do their computation/updates.
 
+### Mobile Audio Unlock
+Many mobile browsers (iOS Safari, Android Chrome/Firefox) gate audio playback until a user interacts with the page. The engine therefore treats audio unlock as part of startup:
+
+1. Shared AudioContext
+  - All `Sound` assets route through a single `engine.audioContext`.
+  - Creation is deferred until the first trusted gesture to avoid iOS suspending it automatically.
+2. Unlock gesture listeners
+  - `<game>` registers `mousedown` and `keydown` listeners.
+  - On the first gesture, it calls `engine.ensureAudioUnlocked()` which:
+    - Creates/Resumes the shared AudioContext.
+    - Plays a silent buffer (Web Audio) to satisfy iOS’s “user-initiated” requirement.
+    - Removes the temporary listeners.
+    - Sets `engine.audioUnlocked = true` and emits `audioUnlocked` on the root `Actor`.
+3. UI affordance
+  - Until `audioUnlocked`, the default `<InGameUI>` overlay displays “Tap to enable audio.” Designers can override or restyle this, but they should ensure at least one obvious interaction exists.
+4. Queued playback
+  - `Sound.play()` checks `engine.audioUnlocked`.
+  - If `false`:
+    - BGM/SFX requests are queued per `Sound` instance (latest request wins).
+    - Once unlocked, the queue flushes automatically.
+  - If designers prefer manual control, they can listen for `audioUnlocked` and emit their own play triggers.
+5. Platform notes
+  - **iOS Safari**: Requires the silent buffer trick plus a resumed AudioContext. After unlock, normal behavior (looping music, multiple voices) works without further gestures.
+  - **Android Chrome/Firefox**: Similar requirement but less strict; the same unlock flow covers both.
+  - Navigating away or reloading the page resets the lock; the engine re-arms the listeners each time.
+6. API Surface
+  - `engine.ensureAudioUnlocked()` returns a promise that resolves once audio is available.
+  - `engine.audioUnlocked` boolean reflects current state.
+  - Root actor receives `audioUnlocked` trigger so `Behaviors`/`InGameUI`s can react (e.g., start music, hide overlays).
+
 ---
 # UPDATE LOOP
 Variable dt:
@@ -1286,14 +1486,6 @@ TODO: Options To Consider:
 # TODO: QUESTIONS to INVESTIGATE
 
 - on iOS mobile, they block audio unless you tap a button, how do we ensure that game audio plays, given the structure above?
-
-- Def system might be too unweildly, granular, spread out.
-  - Should we ALSO allow inline defs in the Asset instance as well?   if so, then we'd want a way to embed the exact same `<Asset>Def` into the `def: {...}` parameter of an Asset instance, right?   same loader for both.  defs would always be registered in the corresponding definition registry by their id (or GUID if no id given).
-  - This would mean that Defs can be
-    1. inline in the Asset (no reuse)
-    2. inline in the Def (reuse by all Assets in that one `world.json`)
-    3. on the filesystem (reuse by multiple `world.json`'s).  Incremental levels of reuse here.
-  - Where best to update the above spec, with this idea?     
 
 ---
 # END SPEC v1.0
