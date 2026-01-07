@@ -898,6 +898,29 @@ Reusable Widget Library
       - include: `<asset path>`  (updates via PUT to the `save/<asset path>` data endpoint)
   - see `editor.js` description below for more of these components......
 
+### Tying it all together - Project & Asset Workflow
+
+how designers
+- clone worlds
+- select or switch the active `world.json`
+  - from Asset Mgmt & Preview, designers pick a world.json; that choice drives the World Editor and UI tab. Mention how the backend remembers the active project per session.
+- promote files Between Inline vs include
+  - designers can copy config data, flip the <asset-editor> selector from inline to include (or vice versa), and paste the data into the new location.
+  - For now this is manual; automated promote/demote can be a future enhancement.
+- version assets
+  - Versioning: document that every save via the backend automatically snapshots the previous file into assets/.versions/..., so designers can restore old versions from Asset Mgmt & Preview.
+
+We can see each one of these, in more detail, explained in `Asset Mgmt & Preview` above.
+
+
+
+Cloning/branching: describe the “clone” action (already mentioned earlier) to duplicate an entire game directory (assets/zelda → assets/zelda-clone). Note that the editor treats each top-level assets/<project> as an independent world.
+
+
+
+Workflow summary: bullet the typical loop: select project → edit world → save → optional clone/version → test in play mode.
+
+
 ### The included editor.js (implements GameProjectEditor)
 The engine comes with an `editor.js` `GameProjectEditor` component.
 A user may create new `GameProjectEditor`s (e.g. `myeditor.js`) using
@@ -905,7 +928,7 @@ A user may create new `GameProjectEditor`s (e.g. `myeditor.js`) using
 or
 - using their favorite code editor to directly edit on their own local filesystem (without asset mgmt).
 
-### Structure inside the included `editor.js`
+### Structure inside the included `editor.js` webcomponent
 - defines the root level `<GameProjectEditor>` html web component
 - initializes with "Asset Mgmt & Preview" tab when there is no active `world.json` selected, all other tabs are hidden until then.
 - several child web components under that
@@ -931,113 +954,9 @@ or
       - with callback for detecting changes (using a web-component API method addListener(...))
 - Structure under `<GameProjectEditor>`
   - Tabs:
-    - Actor Definition Editor
-    - Behavior Definition Editor
-    - Sprite Definition Editor
-    - Map Definition Editor
-    - Sound Definition Editor
     - Asset Mgmt & Preview
-- Actor Definition Editor
-  - 2 panes (left and right):
-    - preview pane (2d canvas) - left
-      - represents an `Actor` instance spawned from selected `ActorDef`
-      - Controls
-        - behavior trigger buttons (one per named trigger in the child behaviors)
-    - data pane - right
-      - listview with list of all `ActorDef`s in `world.json`
-      - `ActorDef` editor (datadriven by the base `ActorDef` config structure), for example:
-        - Add/Remove to/from child `AssetDef` lists (`actors`, `behaviors`, `sprites`, `maps`, `sounds`), by picking from relevant `AssetDef` list
-        - Edit behavior custom data fields on the Actor, exposed by the child `BehaviorDef` definition(s) (e.g. health, speed, faction, flags, etc.)
-        - Editing of each `AssetDef` is auto-driven by it's respective `AssetDef` definition.
-  - Saves to `world.json` definitions
-- Behavior Definition Editor
-  - 2 panes (left and right):
-    - preview pane (2d canvas)
-      - represents an `Actor` instance spawned from selected `ActorDef`
-      - Controls
-        - play and stop buttons, trigger buttons (one per named trigger in the Actor's Behaviors)
-    - data pane
-      - listview with list of all `ActorDef`s in `world.json`
-      - `ActorDef` editor (datadriven by the base `ActorDef` config structure)
-      - `BehaviorDef` editor (datadriven by the base `BehaviorDef` config structure), for example:
-        - shows the top-level structure of a `BehaviorDef`
-  - Saves to `world.json` definitions
-  - Reuse the web-component `<JavascriptCodeEditor>` code editor for JavaScript
-  - Edit the BehaviorDef fields, for example:
-    - Create triggers, edit code for the trigger
-- Sprite Definition Editor
-  - 2 panes (left and right):
-    - preview pane (2d canvas)
-      - represents a `Sprite` instance spawned from selected `SpriteDef`
-      - Controls
-        - play and stop buttons, state trigger buttons (one per named state)
-    - data pane
-      - listview with list of all `SoundDef`s in `world.json`
-      - `SpriteDef` editor (datadriven by the base `SpriteDef` config structure), for example:
-        - Upload new sprite image to assets backend
-        - Select a sprite image from assets backend, and set it into the `SpriteDef`
-        - all other fields from the the base `SpriteDef` config structure
-  - Saves to `world.json` definitions
-- Map Definition Editor
-  - 2 panes (left and right):
-    - preview pane (2d canvas)
-      - represents a `Map` instance spawned from selected `MapDef`
-      - Controls
-        - LeftMouseClick to Paint tileIDs onto the MapTiles
-        - RightMouseClick to pan the map
-        - MouseScroll to zoom the map
-    - data pane
-      - listview with list of all `MapDef`s in `world.json`
-      - `MapDef` editor (datadriven by the base `MapDef` config structure), for example:
-        - Upload new map tile image to assets backend
-        - Select a map tile image from assets backend, and set it into the `MapDef`
-        - Create or Delete chunks
-        - Edit chunk:
-          - Visually select a tileID from the MapImage, then Paint tileIDs onto the MapTiles 
-          - Edit chunk x,y position
-        - all other fields from the the base `MapDef` config structure
-  - Saves to `world.json` definitions
-- Sound Definition Editor
-  - 2 panes (left and right):
-    - preview pane (audio icon)
-      - represents a `Sound` instance spawned from selected `SoundDef`
-      - Controls
-        - play and stop buttons
-    - data pane
-      - listview with list of all `SoundDef`s in `world.json`
-      - `SoundDef` editor (datadriven by the base `SoundDef` config structure), for example:
-        - Upload new sound file to assets backend
-        - Select a sound file from assets backend, and set it into the `SoundDef`
-        - all other fields from the the base `SoundDef` config structure
-  - Saves to `world.json` definitions
-- Actor placement Editor
-  - 2 panes (left and right):
-    - preview pane (2D canvas)
-      - represents `Actor`s instances overlaid over a `Map` instance
-      - Controls:
-        - Move Map:  RightMouseClick on map pans the map
-        - Create Actor: LeftMouseClick to create Actor (with ActorDef listview's selection)
-        - Edit Actor: LeftMouseClick an Actor to edit that Actor and auto-scroll in the Actor Graph
-        - Delete Actor: Press "delete" or "backspace" while Actor is selected to remove
-        - Move Actor: LeftMouseClick on actor and drag with mouse to move the actor, ctrl-x/c/v works to cut/copy/paste, paste goes to center of the map
-    - data pane
-      - listview - All `ActorDef`s
-        - Visually see the `world.json` list of `ActorDefs`
-        - Workflows
-          - select one, then click the preview pane to place
-          - select one, which populates the Editor, then use Editor to edit.
-      - hierarchical listview - Actor Graph (instances) 
-        - Visually see the `world.json` hierarchical `Actor` graph (from the root)
-        - Workflows:
-          - Drag `Actor`s onto other `Actor`s to affect parent/child relationship
-          - listview elements support Collapse / Expand
-          - select one, which populates the Editor, then use Editor to edit.
-      - Selected Editor
-        - Shows an editor for the active `Actor` instance or `ActorDef` selection, whichever was last selected
-      - Save button writes a new `world.json` to assetmanagement filesystem
-  - Saves to `world.json`
-    - expected to replace entire actor hierarchy (new child relationships, new x,y positions, new/removed Actors)
-- UI Definition Editor
+    - UI Definition Editor
+- InGameUI Definition Editor
   - 2 panes (left and right):
     - 1 big pane with 2 sub tabs:
       - Code Editor for the selected `InGameUIDef`
@@ -1055,8 +974,10 @@ or
       - Preview Button to jump to my preview pane tab
       - Save Button to write `world.json`
   - Saves to `world.json` definitions
-- World Editor (world Actor Placement and Editing)
-  - **Purpose:** A unified workspace for laying out the `Actor` hierarchy defined under `world.json` root `actor`.
+
+### World Editor - The main game editor, for Actor definition and Placement
+  - **Purpose:** A unified workspace for laying out the `Actor` hierarchy defined under `world.json` root `actor`, as well as for defining `Actor`s including all child Asset types under that `Actor`.
+  - defines the `<world-editor>` webcomponent which sits within one tab of the root level `<GameProjectEditor>` html web component.
   - 2 Panes (left and right):
     - **Viewport pane (left)**:
       - `WorldViewport`: a black viewport renders the static (initialization-time) game world using the engine runtime.  (`<WorldViewport>` as a reusable web component)
@@ -1078,93 +999,375 @@ or
     - **...with a reactive layout**:
       - panes fit the browser reactively, if too narrow (e.g. on mobile) then left pane is on top, and right pane is on bottom.
       - divider between the panes is positionable, which can resize both panes at once.
-  - New Placement workflow:
-    1. Click explicit mode toggle “Place Actor” button. (found in the floating pills)
-    2. Optionally toggle “snap to parent” button. (found in the floating pills), if unchecked, new actors always attach under the root `Actor` regardless of what’s selected, which prevents accidental deep nesting.
-    3. Select an `ActorDef` in the right-hand datapane listview.
-    4. Optionally select an `Actor` instance in the right-hand datapane hierarchical listview. (if selected, new placed `Actor` will become a child under this `Actor`)
-    5. Clicking the `WorldViewport`, receives the selected data; and x,y world position clicked on (mouse x,y position is translated into "game world" x,y)
-    6. A new `Actor` instance data (derived from the selected `ActorDef` data) is appended to `world.json` under the selected `actor`'s children (or under root if no `Actor` selection), setting the x,y data for that `Actor` instance.
-    7. The new instance appears immediately; undo/redo integrates with the editor’s history stack.
-    8. After a placement, stay in placement mode but show a floating “Done” pill so designers can exit quickly (handy on mobile where hitting ESC isn’t an option).
-  - Copy/Paste Placement workflow:
-    1. Select an `Actor` instance in either a. the right-hand datapane hierarchical listview, or, b. from the `WorldViewport`.
-    2. Press ctrl-c to copy, or long-press on the `Actor` to copy, or use on-screen copy/paste buttons. (found in the floating pills)
-    3. Upon paste (ctrl-v, or paste button pill), set mode status "place actor".  Show a ghost actor following the cursor/finger. The next tap drops it and sets the world x/y.  cancel the mode status "place actor" with escape or "x" on the status
-      - the `WorldViewport` receives the copied data; and x,y world position of the mouse cursor or tap location
-      - mouse/tap x,y position is translated into "game world" x,y
-    4. A new `Actor` instance data (derived from the selected `ActorDef` data) is appended to `world.json` as a sibling of the selected `Actor` instance, setting the x,y data for that `Actor` instance offset in x by the bounding box width (they might stack up on top of each other, that's ok).
-    5. The new instance appears immediately; undo/redo integrates with the editor’s history stack.
-  - Selection workflow:
-    1. Clear the ActorDef list selection (or press Esc) to leave placement mode.
-    2. Click any Actor in the viewport to select/focus it. The selection outline highlights in-scene.
-    3. Data pane updates with:
-      - In the actor-graph hierachical listview, shows the focused `Actor` highlighted and scrolled into view.
-      - Below that we've added an editor card to represent the selected `Actor` instance (shows def, position, custom data, child asset references).
-      - Upon selection of sub features (def, child assets, data fields) of that `Actor` instance, then, more Nested editors will appear under that card, for those linked assets (Sprite instances, Behavior instances, etc.). Clicking a child drills deeper, pushing another editor card under the parent.
-      - Links back to source `ActorDef` so designers can jump between instance tweaks and definition edits.
-  - Editing model:
-    - Each editor widget edits JSON data only; it doesn’t execute code directly.
-    - The widget is given the JSON pointer (`world.json/<path>`) so saves route to the correct spot (inline instance, inline def, or include file).
-    - Undo/redo spans all widgets so “drill-down edits” roll back cohesively.
-  - Generic `<asset-editor>`:
-    - Provide one reusable `<asset-editor>` component that accepts:
-      - data: the current JSON payload.
-      - schema: field definitions (labels, types, validation, nested repeaters). Each asset type (Actor, Sprite, Map, Sound, Behavior, UIDef, EditorDef) supplies its schema via a registry so the UI   - adapts automatically.
-      - onChange callback that emits the new JSON plus metadata indicating whether the payload should be written inline or to an include file.
-    - Specialized editors (e.g., sprite image picker, tilemap painter) plug into slots defined by the schema so high-fidelity tools coexist with the generic form.
-    - Benefits: single code path for validation, consistent UX, easier maintenance as new asset types arrive.
+
+### WorldViewport
+
+#### Mode: Map Tile Edit
+In the right side data pane
+1. Select the `Actor` with the `Map` child asset.
+2. Select the `Map` child asset to select the map.
+3. Select the `Map` chunk from the list of chunks
+
+In the WorldViewport
+1. Select the `Actor` with the `Map` child asset.
+2. Tap again to Select the `Map` child asset to select the map. (special case for actors with maps)
+3. Select the `Map` chunk visually (first chunk intersected visually gets selected)
+
+Then,
+4. WorldViewport mouse/tap interactions now are exclusive to that selected `Map` and chunk data
+5. Select a maptile, either:
+  - from the `maptile-picker` in the data pane, or
+  - by right clicking on a maptile in WorldViewport
+6. left-click or tap to paint a maptile into the current chunk, as many times as needed.
+
+changing chunks
+7. by clicking on another `Map` chunk
+
+exit: changing to another actor
+8. change selection away from `Map`
+  - by clicking on another `Actor`
+  - press escape to change selection to the `Map`'s `Actor`
+
+Save/undo: note that tile changes go through the same undo/redo stack as actor edits, so designers can step back a paint stroke.
+
+
+#### Mode: Snap - Actor Placement workflow:
+By default, there is no grid for snapping Actors. 
+There will be a button toggle for snapping (found in the floating pills)
+- How it works:
+  - While moving the selected `Actor`'s
+    - Snap the `Actor`'s `x`,`y` such that the `Actor`'s `boundingBox` is centered onto the grid as defined by the underlying `Map` tile.   If there's no `Map` under the cursor (or finger), then no snap.
+
+#### Mode: New - Actor Placement workflow:
+1. Click explicit mode toggle “Place Actor” button. (found in the floating pills)
+2. Optionally toggle “snap to parent” button. (found in the floating pills), if unchecked, new actors always attach under the root `Actor` regardless of what’s selected, which prevents accidental deep nesting.
+3. Select an `ActorDef` in the right-hand datapane listview.
+4. Optionally select an `Actor` instance in the right-hand datapane hierarchical listview. (if selected, new placed `Actor` will become a child under this `Actor`)
+5. Clicking the `WorldViewport`, receives the selected data; and x,y world position clicked on (mouse x,y position is translated into "game world" x,y)
+6. A new `Actor` instance data (derived from the selected `ActorDef` data) is appended to `world.json` under the selected `actor`'s children (or under root if no `Actor` selection), setting the x,y data for that `Actor` instance.
+7. The new instance appears immediately; undo/redo integrates with the editor’s history stack.
+8. After a placement, stay in placement mode but show a floating “Done” pill so designers can exit quickly (handy on mobile where hitting ESC isn’t an option).
+
+#### Mode: Edit Copy/Paste - Actor Placement workflow:
+1. Select an `Actor` instance in either a. the right-hand datapane hierarchical listview, or, b. from the `WorldViewport`.
+2. Press ctrl-c to copy, or long-press on the `Actor` to copy, or use on-screen copy/paste buttons. (found in the floating pills)
+3. Upon paste (ctrl-v, or paste button pill), set mode status "place actor".  Show a ghost actor following the cursor/finger. The next tap drops it and sets the world x/y.  cancel the mode status "place actor" with escape or "x" on the status
+  - the `WorldViewport` receives the copied data; and x,y world position of the mouse cursor or tap location
+  - mouse/tap x,y position is translated into "game world" x,y
+4. A new `Actor` instance data (derived from the selected `ActorDef` data) is appended to `world.json` as a sibling of the selected `Actor` instance, setting the x,y data for that `Actor` instance offset in x by the bounding box width (they might stack up on top of each other, that's ok).
+5. The new instance appears immediately; undo/redo integrates with the editor’s history stack.
+
+#### Mode: Edit Delete - Actor Placement workflow:
+1. Select an `Actor` instance from the `WorldViewport`.
+2. to delete the selected `Actor`:
+  - Press "delete", "backspace", or the "X" button in the pills toolbar
+
+
+#### Mode: Edit Move - Actor Placement workflow:
+1. Select an `Actor` instance from the `WorldViewport`.
+2. Drag that `Actor` to modify it's x,y position
+
+Tap/Click Selection Priority is given:
+- to the last sibling, since last sibling draws on top of previous siblings.
+- to the Child-most sibling, since parents draw first while children draw last.
+
+#### Mode: Edit Actor data - Actor edit workflow:
+1. Clear the `ActorDef` list selection (or press Esc) to leave placement mode.
+2. Click any `Actor` in the viewport to select/focus it. The selection outline highlights in-scene.
+3. Data pane updates with:
+  - In the actor-graph hierachical listview, shows the focused `Actor` highlighted and scrolled into view.
+  - Below that we've added an editor card to represent the selected `Actor` instance (shows def, position, custom data, child asset references).
+  - Upon selection of sub features (def, child assets, data fields) of that `Actor` instance, then, more Nested editors will appear under that card, for those linked assets (Sprite instances, Behavior instances, etc.). Clicking a child drills deeper, pushing another editor card under the parent.
+  - Links back to source `ActorDef` so designers can jump between instance tweaks and definition edits.
+
+### The data pane asset-editor stack - Editing model for all tabs:
+- Generic `<asset-editor>` editor widget is a webcomponent, which can edit all Asset types
+- Each `<asset-editor>` edits JSON data only; it doesn’t execute code directly, but does have `onchange` callbacks.
+  - Example: `<asset-editor data='world_json_data.actor[2].actors[0]' schema="actor_schema" onchange='mycallback(e)'>`
+  - that `data` is the javascript object data it will edit
+  - that `schema` configures the `<asset-editor>`, containing:
+    - Field definitions (key/value data, types, validation, child asset lists).  
+    - Each asset type (world json, Actor, Sprite, Map, Sound, Behavior, UIDef, EditorDef) supplies its schema via a registry so the UI adapts automatically.
+  - that `onchange` handler allows the caller to update the original data in the original location in `world.json` or assetfilesystem.
+- Specialized editors (e.g., sprite image picker, tilemap painter) plug into slots defined by the schema so high-fidelity tools coexist with the generic form.
+- Benefits: single code path for validation, consistent UX, easier maintenance as new asset types arrive.
+
+#### asset-editor Asset Editor Schema Type language
+Generic language we'll use in our type schemas
+Type Schemas define how our datatypes display and edit:
+- `data:<type>` a single simple data parameter, where type can be ["string", "number", "boolean", Actor,Behavior,Sprite,Sound,Map,definition]
+  - as an inline webcomponent `<editor-component-data>`
+  - displays as a single line indented under it's parent, 
+  - edit by clicking to focus, typing to change, and blur to accept or escape to revert
+    - basic types ["string", "number", "boolean"] will edit inline
+    - complex types [World,Actor,Behavior,Sprite,Sound,Map,ActorDef,BehaviorDef,SpriteDef,SoundDef,MapDef,ActorDefConfig,BehaviorDefConfig,SpriteDefConfig,SoundDefConfig,MapDefConfig] will insert a new `asset-editor` to edit that data (allowing user to drill down by inserting more `asset-editor` UI cards)
+- `data:string,<editor1>,<editor2>,...`, additional optional editors appear as buttons next to the string display.   tapping the string edits the string as normal, tapping one of the buttons launches that particular editor (which edits that string).
+  - as an inline webcomponent `<editor-component-data editors="<editor1>,<editor2>,...">`
+  - possible custom editors:
+    - "code": launches a `<javascript-code-editor data="str" onchange="callback(e)">` with that string data
+    - "assetrequestor": launches a `<asset-requestor data="str" onchange="callback(e)">` with that string data
+    - "ActorDef": launches a `<assetdef-requestor data="str" list="world_json_data.actors">` requestor
+    - "BehaviorDef": launches an `<assetdef-requestor data="str" list="world_json_data.behaviors">` requestor
+    - "SpriteDef": launches an `<assetdef-requestor data="str" list="world_json_data.sprites">` requestor
+    - "MapDef": launches an `<assetdef-requestor data="str" list="world_json_data.maps">` requestor
+    - "SoundDef": launches an `<assetdef-requestor data="str" list="world_json_data.sounds">` requestor
+- `array[data:<type>,<editor1>,<editor2>,...]` an array of datatype values
+  - as an inline webcomponent `<editor-component-array type="data:<type>" editors="<editor1>,<editor2>,...">` which knows how to create child webcomponents based on the type and editors.
+  - display: as the array name indented under its parent.  with one line per array entry indented under the array name.
+  - edit: there will be a "-" icon for each line to remove, and a "+" icon to add new lines.
+    - with normal `data:<type>` editing rules for each array entry.
+- `object{data:<type>,<editor1>,<editor2>,...}` an object with keys, each one with datatype value
+  - as an inline webcomponent `<editor-component-object type="data:<type>" editors="<editor1>,<editor2>,...">` which knows how to create child webcomponents based on the type and editors.
+  - display: as the object name indented under its parent.  with one line per key entry indented under the object name.  each line shows keyname (editable) and its datatype value.
+  - edit: there will be a "-" icon for each line to remove, and a "+" icon to add new lines.
+    - with normal `data:<type>` editing rules for each array entry.
+- `selector[type1|type2|...|typeN]`
+  - as an inline webcomponent `<editor-component-selector types="[type1,type2,...]">`
+  - display:  the name and its value (not the selected type), indented under its parent
+  - edit:  when its contents are focused, intert a new `asset-editor` with a dropdown with the current selected type, can change the type; each selected type displays editing using the rules for `data:<type>`.
+- `enum[value1|value2|...|valueN]` simple dropdown with option selection
+  - as an inline webcomponent `<editor-component-enum types="[value1|value2|...|valueN]">`
+  - display:  the name and its value, indented under its parent
+  - edit:  when its contents are focused, a dropdown with the current selected value, can change the value using dropdown.
+
+#### asset-editor Asset Type Editor Schemas
+Type schemas for `<asset-editor>` for all custom datatypes define how they display and edit.
+`World`
+```
+{
+  "actorDefs": "array[ActorDef]",
+  "spriteDefs": "array[SpriteDef]",
+  "mapDefs": "array[MapDef]",
+  "soundDefs": "array[SoundDef]",
+  "behaviorDefs": "array[BehaviorDef]",
+  "actor": "Actor",
+}
+```
+
+`ActorDef`
+```
+"id":     "data:string",              // optional, if "" then will generate a guid
+"config": "selector[data:string,assetrequestor,code|data:ActorDefConfig]", // string: inline json, javascript, or assetfilesystem path;  or the inline definition type
+```
+`ActorDefConfig`
+```
+{
+  "Behaviors": "array:Behavior",
+  "Sprites": "array:Sprite",
+  "Sounds": "array:Sound",
+  "Maps": "array:Map",
+  "Actors": "array:Actor",
+  "x": "data:number",
+  "y": "data:number",
+  "data":     "object{selector[data:string,data:boolean,data:number]}", // per instance overrides
+}
+```
+`Actor` instance
+```
+{
+  "id":  "data:string",             // name of this instance
+  "def": "selector[data:string,ActorDef|data:ActorDef]",         // ActorDef id (reference), or inline ActorDef (literal definition)
+  "x":   "data:number",             // x position, relative to parent. 2D sprites dont have rotation
+  "y":   "data:number",             // y position, relative to parent. 2D sprites dont have rotation
+  "data":     "object{selector[data:string,data:boolean,data:number]}", // per instance data that behaviors may use
+}
+```
+
+`BehaviorDef`
+```
+"id":     "data:string",                        // optional, if "" then will generate a guid
+"config": "selector[data:string,assetrequestor,code|data:BehaviorDefConfig]", // string: inline json, javascript, or assetfilesystem path;  or the inline definition type
+```
+`BehaviorDefConfig`
+```
+{
+  "data":     "object{selector[data:string,data:boolean,data:number]}",
+  "triggers": "object{data:string,code}",
+}
+```
+`Behavior` instance (instance overrides, data fields)
+```
+{
+  "id":       "data:string",                                   // instance id
+  "def":      "selector[data:string,BehaviorDef|data:BehaviorDef]",
+  "x":        "data:number",
+  "y":        "data:number",
+  "data":     "object{selector[data:string,data:boolean,data:number]}", // per instance overrides
+  "triggers": "object{data:string,code}"                       // optional trigger overrides
+}
+```
+
+`SpriteDef`
+```
+"id":     "data:string",              // optional, if "" then will generate a guid
+"config": "selector[string|SpriteDefConfig]", // string: inline json, javascript, or assetfilesystem path;  or the inline definition type
+```
+`SpriteDefConfig`
+```
+{
+  "image":            "data:string,assetrequestor",            // sprite sheet path
+  "frameWidth":       "data:number",
+  "frameHeight":      "data:number",
+  "states":           "object{data:number}",                   // state name → row index
+  "state":            "data:string",                           // the default state
+  "frameRateHz":      "data:number",
+  "direction":        "enum[fwd,rev,rand,fwd_once,rev_once]",       // enum enforced in UI
+  "nocollide_colors": "array[data:string,colorpicker]",
+  "boundingBox":      {
+    "x1": "data:number",
+    "y1": "data:number",
+    "x2": "data:number",
+    "y2": "data:number",
+  }
+}
+```
+`Sprite` instance
+```
+{
+  "id":        "data:string",
+  "def":       "selector[data:string,SpriteDef|data:SpriteDef]",
+}
+```
+
+`MapDef`
+```
+"id":     "data:string",              // optional, if "" then will generate a guid
+"config": "selector[string|MapDefConfig]", // string: inline json, javascript, or assetfilesystem path;  or the inline definition type
+```
+`MapDefConfig`
+```
+{
+  "tileImage":        "data:string,assetrequestor",
+  "tileWidth":        "data:number",
+  "tileHeight":       "data:number",
+  "nocollide_colors": "array[data:string,colorpicker]",
+  "chunks": "array{
+      "id":             "data:string",
+      "enable":         "data:boolean",
+      "x":              "data:number",
+      "y":              "data:number",
+      "tileMapWidth":   "data:number",
+      "tileMapHeight":  "data:number",
+      "tileMap":        "array[data:number],tilemapeditor",
+      "boundingBox":      {
+        "x1": "data:number",
+        "y1": "data:number",
+        "x2": "data:number",
+        "y2": "data:number",
+      }
+  }"
+}
+```
+`Map` instance (chunk positions, enable flags)
+```
+{
+  "id":        "data:string",
+  "def":       "selector[data:string,MapDef|data:MapDef]",
+  "x":         "data:number",
+  "y":         "data:number",
+}
+```
+
+`SoundDef`
+```
+"id":     "data:string",              // optional, if "" then will generate a guid
+"config": "selector[string|SoundDefConfig]", // string: inline json, javascript, or assetfilesystem path;  or the inline definition type
+```
+`SoundDefConfig`
+```
+{
+  "audio":        "data:string,assetrequestor",
+  "spatial":      "data:boolean",
+  "x":            "data:number",
+  "y":            "data:number",
+  "size":         "data:number",
+  "falloff_size": "data:number",
+  "falloff_type": "enum[linear,exponential]",
+  "loop":         "data:boolean",
+  "voices":       "data:number",
+  "gain":         "data:number"
+}
+```
+`Sound` instance
+```
+{
+  "id":        "data:string",
+  "def":       "selector[data:string,SoundDef|data:SoundDef]",
+  "x":         "data:number",
+  "y":         "data:number",
+}
+```
+
+`InGameUIDef`
+```
+"id":     "data:string",              // optional, if "" then will generate a guid
+"config": "selector[string|InGameUIDefConfig]", // string: inline json, javascript, or assetfilesystem path;  or the inline definition type
+```
+`InGameUIDefConfig`
+```
+{
+  "code": "data:string,code"              // inline JS defining <InGameUI>
+}
+```
+`InGameUI` instance
+```
+{
+  "def":       "selector[data:string,InGameUIDef|data:InGameUIDef]",
+}
+```
+
+`GameProjectEditorDef`
+```
+"id":     "data:string",              // optional, if "" then will generate a guid
+"config": "selector[string|GameProjectEditorDefConfig]", // string: inline json, javascript, or assetfilesystem path;  or the inline definition type
+```
+`GameProjectEditorDefConfig`
+```
+{
+  "code": "data:string,code"              // inline JS defining <GameProjectEditor>
+}
+```
+`GameProjectEditor` instance
+```
+{
+  "def":       "selector[data:string,GameProjectEditorDef|data:GameProjectEditorDef]",
+}
+```
+
+### Components
   - Here’s the full set of UI/web components the spec now implies, grouped by role. Everything lives under the World Editor umbrella so they can be re-used in other tabs.
-    - Core World Editor Shell
+    - Generic Editing Infrastructure
+      - `<asset-editor>` renders any schema; see previous section for details
+    - Core World Editor Shell components
       - `world-editor`: owns the tab, orchestrates viewport/data pane, undo/redo.
       - `world-viewport`: renders runtime scene, handles pan/zoom, placement ghost, selection outline.
       - `actor-pills-toolbar`: floating controls (Place Actor, Snap to Parent, copy/paste buttons, “Done” chip, status indicator).
       - `actor-hierarchy-list`: tree view of the current world.json.actor hierarchy (select, expand/collapse, drag/drop reorder).
       - `actordef-list`: flat list of all ActorDefs; supports search/filter.
       - `editor-card-stack`: container that shows stacked contextual editors as you drill down (push/pop cards).
-    - Generic Editing Infrastructure
-      - `<asset-editor>` (generic data editing form). Which auto-configures based on schemas for the following:
-        - `ActorDef`
-        - `Actor` instance
-        - `BehaviorDef`
-        - `Behavior` instance (instance overrides, data fields)
-        - `SpriteDef`
-        - `Sprite` instance
-        - `MapDef`
-        - `Map` instance (chunk positions, enable flags)
-        - `SoundDef`
-        - `Sound` instance
-        - `InGameUIDef`
-        - `InGameUI` instance
-        - `GameProjectEditorDef`
-        - `GameProjectEditor` instance
-      - Each schema should describe
-        - primitive fields (bool, number (with min/max), string, options list, key/value pair(s))
-        - child Asset instance lists (`Behaviors`, `Sprites`, etc.)
-        - optionally if a special editor is needed upon click, e.g.
-          - `Behavior` `triggers` editor (key/value pairs), where clicking the trigger key's value pops up a `javascript-code-editor`, which edits the string field for that trigger key's value.
-          - `Map`'s `maptile` editor (string type), clicking the value pops up a
-          - `Sound` file (string type), clicking raises a `file-requestor` with (`wav`|`m4a`|`mp3`) extension filter
-      - `<asset-editor>` provides a callback hook on change, so that changes get propagated to the right location:
-        - in the asset vs in the definitions
-        - inline vs assetfilesys
     - Specialized / One-off Editors
-      - `file-requestor`: pops up a dialog with the file, certain types will have a preview available (audio or image).
-        - configure with extensions to filter from the backend `<file-requestor exts="['mp3', 'm4a', 'wav']">`
+      - `world-browser`: from a given `world.json`, display a view that looks like a `file-requestor`, for the resources inside `world.json`
+        - a folder of the AssetDef lists
+        - a folder of the actor-graph of Actor instances
+      - `file-requestor`: pops up a assetfilesystem browser
+        - sits on top of the GET assetfilesystem endponts
+          - browse entire assetfilesystem tree served from the backend
+          - browse resources inside `world.json` as if it was a directory (use `<world-browser>` once `world.json` is clicked on)
+        - certain file types will have a preview available (audio, image, sprite, map).
+          - for file types without a preview, just show generic file icon
+        - configure with extensions to filter from the assetfilesystem backend `<file-requestor exts="['mp3', 'm4a', 'wav']">`
       - `javascript-code-editor`: existing component used for Behavior, UI, and Editor defs (syntax highlighting, save hooks).
       - `sprite-state-preview`: canvas preview with play/stop controls, frame/state selector.
       - `sprite-image-picker`: chooser for sprite sheets from the asset backend, shows thumbnails, enforces frame dimensions.
-      - `map-chunk-editor`: provides tilemap painting, chunk creation/deletion, per-chunk transform editing.
-      - `tilepicker-panel:` palette of tiles taken from the map’s tileset image (works inside the chunk editor).
+      - `tilemap-editor`: provides tilemap painting, chunk creation/deletion, per-chunk transform editing, chunks x,y pos transform snaps to tile grid.
+      - `maptile-picker:` palette of tiles taken from the map’s tileset image (works inside the chunk editor).
       - `sound-preview-panel`: play/stop buttons, waveform visualization, gain/falloff sliders tied to SoundDef.
       - `asset-reference-picker`: generic dialog for selecting existing defs/instances when wiring child assets (used inside `Actor` editor for choosing child `BehaviorDef`/`SpriteDef` references).
       - `inline-include-toggle`: small widget that lets designers flip between inline JSON and include file storage for a particular sub-object.
       - Utility/Support Components
-        - `selection-overlay:` draws outlines/bounding boxes for the currently selected Actor(s) in the viewport.
-        - `ghost-actor-preview`: appears during placement/copy workflows; follows pointer and snaps to grid when needed.
-        - `undo-redo-controls`: toolbar or keyboard handler integrated with the world editor history stack.
-        - `status-toast` / `guidance-banner`: to notify users (e.g., “Placement mode active”, “Snap-to-parent off”).
-        - `asset-schema-registry`: not a visual component but a module providing schema definitions to `<asset-editor>` so it can render the correct controls per asset type.
+        - `toolbar`: floating toolbar of pill buttons.  redo/undo (world editor history stack), copy, paste, placement mode, etc...
+        - `status-toast` to notify users (e.g., “Placement mode active”, “Snap-to-parent off”).  Fade / disappear after 2 seconds...
+        - `guidance-prompt`: “Place Items Now [cancel]”.
 
 
 
@@ -1358,7 +1561,7 @@ assets/.versions/<mirrored tree>/
 
 # EDITOR BACKEND FS ABSTRACTION
 
-The BuiltInEditor (`editor-backend.js`) serves data endpoints for
+The BuiltInEditor (`editor-backend.js`) serves data endpoints for the assetfilesystem:
 - **list** the entire tree of gameprojects (e.g. `assets/` dirs) and their assets (via HTTP GET `/path/to/dir`)
   - returns JSON recursive/nested hierarchy of paths (unless `?recursive=false` is passed)
   - returns success (status=200) or fail (status=400)
