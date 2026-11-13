@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>ANKH — 64 Rooms</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <main>
+    <header><h1>ANKH</h1><p>64 Rooms: An Adventure in the MetaReal World</p></header>
+    <section class="console" aria-label="ANKH game">
+      <canvas id="game" width="272" height="192" tabindex="0" aria-label="ANKH game canvas"></canvas>
+      <p id="status" role="status"></p>
+    </section>
+    <nav class="mobile-actions" aria-label="Action modifiers">
+      <button type="button" data-mode="step">STEP</button>
+      <button type="button" data-mode="shoot">SHOOT</button>
+      <button type="button" data-mode="touch">TOUCH</button>
+      <button type="button" data-mode="stop">STOP</button>
+    </nav>
+    <section class="mobile-settings" role="dialog" aria-modal="true" aria-label="Mobile settings" hidden>
+      <h2>SETTINGS</h2>
+      <p>CONE ORIGIN</p>
+      <div><button type="button" data-cone-mode="follow">FOLLOW</button><button type="button" data-cone-mode="stay">STAY</button></div>
+      <p>REACTION LAG</p>
+      <div><button type="button" data-reaction-lag="on">ON</button><button type="button" data-reaction-lag="off">OFF</button></div>
+      <button type="button" data-settings-close>DONE</button>
+      <small>Open with two fingers on the score text.</small>
+    </section>
+    <section class="controls">
+      <div><h2>Move</h2><p><kbd>I</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd></p><small><b>Run</b> · <b>Step</b> (Ctrl/Shft) · <b>Stop</b> (Space)</small></div>
+      <div><h2>Act</h2><p><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></p><small><b>Shoot</b> · <b>Touch</b> (Ctrl/Shft)</small></div>
+      <div><h2>Inventory</h2><p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></p><small>Drop object.</small></div>
+    </section>
+    <footer><p><kbd>Space</kbd> or <kbd>Enter</kbd> begins · <kbd>Esc</kbd> rests the universe · <kbd>R</kbd> restarts</p><p>Web port of David Van Brink’s ANKH, based on the Game Boy Advance recreation.</p></footer>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "ankh-js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "echo 'http://localhost:8080' && /usr/bin/python3 -m http.server 8080",
+    "start-debug": "./launch-chrome-debug.sh",
+    "help": "node tools/help.mjs",
+    "generate": "node tools/port-data.mjs",
+    "audit": "node tools/port-data.mjs --check && node --test test/port.test.js",
+    "test": "node --test test/port.test.js",
+    "test:browser": "node tools/browser-check.mjs",
+    "test:nesting": "node tools/wall-nesting-check.mjs",
+    "serve": "/usr/bin/python3 -m http.server 8080"
+  }
+}
