@@ -1,5 +1,7 @@
 # ANKH
 
+[demo](https://subatomicglue.github.io/ankh/ANKH.js/index.html)
+
 a recreation of the 1980's AppleIIe prerelease of the game "[ANKH](http://dvb.omino.com/dvb/software/ankh/index.html)" (by [David VanBrink](http://metareal.net/) published by [Datamost](https://en.wikipedia.org/wiki/Datamost)).  
 
  * [ANKH for Game Boy Advance](GameBoyAdvance) - unfinished work circa 2004-2005 ish...
