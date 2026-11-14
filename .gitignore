@@ -1,4 +1,5 @@
 node_modules
+ANKH.js/certs-debug/
 *.o
 *.d
 
