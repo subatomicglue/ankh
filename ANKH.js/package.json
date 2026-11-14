@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "echo 'http://localhost:8080' && /usr/bin/python3 -m http.server 8080",
-    "start-debug": "./launch-chrome-debug.sh",
+    "start-debug": "DEBUG_OPEN_CHROME=true ./start-debug-server.sh --html index.html",
     "help": "node tools/help.mjs",
     "generate": "node tools/port-data.mjs",
     "audit": "node tools/port-data.mjs --check && node --test test/port.test.js",
