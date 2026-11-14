@@ -5,8 +5,8 @@ Run the game:
   npm start
   Open http://localhost:8080/
 
-Debug Chrome:
-  npm run start-debug  Launch Chrome using launch-chrome-debug.sh (port 3003 URL)
+Debug server and Chrome:
+  npm run start-debug  Find a free port, serve HTTPS, and launch inspectable Chrome
 
 Desktop controls:
   I J K L          Run
@@ -40,5 +40,5 @@ Development:
   npm run audit      Verify generated map/actors and engine tests against GBA
   npm run generate  Regenerate data from the GBA source
   npm run help       Show this help
-  npm run start-debug  Launch the isolated debug Chrome profile
+  npm run start-debug  Start HTTPS plus the isolated debug Chrome profile
 `);
