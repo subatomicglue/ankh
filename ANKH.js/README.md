@@ -12,7 +12,7 @@ From `ANKH.js/`:
 npm start
 ```
 
-Open <http://localhost:8080/>. Run `npm run help` for controls and development commands. `npm run start-debug` launches the isolated Chrome configuration from `launch-chrome-debug.sh`, whose default game URL uses port 3003.
+Open <http://localhost:8080/>. Run `npm run help` for controls and development commands. `npm run start-debug` finds the Mac's LAN address and a free port, starts an HTTPS debug server, prints iPhone setup instructions, and launches an isolated Chrome instance that automation and Codex can inspect.
 
 ## Controls
 
@@ -60,4 +60,4 @@ Run `npm run generate` after changing `GameBoyAdvance/data.cpp` or `walls.map.c`
 
 ## Verification
 
-`npm test` runs the engine/data suite. For the real-browser suite, serve the directory at the URL configured by `ANKH_CHROME_START_URL`, run `npm run start-debug`, then run `npm run test:browser`. The launch script defaults to game port 3003 and Chrome debugging port 9222; normal `npm start` remains on port 8080. The suite checks a desktop/mobile viewport-size matrix, all 64 rooms, transparent-pixel nesting, indexed collision, keyboard controls, cone steering and stopping, held mobile action modifiers, touch animation, inventory-cell dropping, settings, door chains, and the piano sequence. It writes screenshots to `/tmp/ankh-js-browser.png` and `/tmp/ankh-js-mobile.png`.
+`npm test` runs the engine/data suite. For the real-browser suite, run `npm run start-debug` in one terminal and `npm run test:browser` in another. The launcher chooses a free HTTPS port and passes its URL to Chrome; the Chrome debugging port defaults to 9222. Set `DEBUG_SERVER_PORT` to pin the server port, or use `DEBUG_CHROME_PORT`, `DEBUG_CHROME_PROFILE`, and `DEBUG_CHROME_START_URL` for the other launch settings. Normal `npm start` remains on port 8080. Run `./start-debug-server.sh` or `./start-debug-chrome.sh` when you need either half independently. The scripts are self-contained and reusable: use `./start-debug-server.sh --html filename.html` for a static project, or `./start-debug-server.sh --pm2 script.js` for a Node.js server that reads `NODE_USE_HTTPS`, `NODE_HTTPS_PORT`, and `NODE_CERTS_DIR`. The suite checks a desktop/mobile viewport-size matrix, all 64 rooms, transparent-pixel nesting, indexed collision, keyboard controls, cone steering and stopping, held mobile action modifiers, touch animation, inventory-cell dropping, settings, door chains, and the piano sequence. It writes screenshots to `/tmp/ankh-js-browser.png` and `/tmp/ankh-js-mobile.png`.
