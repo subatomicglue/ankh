@@ -31,11 +31,14 @@ export class SoundManager {
   setPolyphony(id,count){const slot=this.slots.get(id);if(!slot)return false;slot.polyphony=Math.max(1,Math.trunc(count));while(slot.voices.length>slot.polyphony)this.stopVoice(slot.voices[0]);return true;}
 
   primeContext(){const source=this.context.createBufferSource();source.buffer=this.context.createBuffer(1,1,this.context.sampleRate);source.connect(this.master);source.start(0);}
+  selectPlaybackSession(){try{if(this.window.navigator?.audioSession)this.window.navigator.audioSession.type='playback';}catch{}}
+  watchContext(){this.context.addEventListener?.('statechange',()=>{if(!this.paused&&this.active&&this.context?.state!=='running'){this.active=false;if(this.unlockElement)this.unlockElement.hidden=false;}});}
 
   async activate(whilePaused=false) {
     if(this.destroyed)return false;
+    this.selectPlaybackSession();
     const AudioContext=this.window.AudioContext??this.window.webkitAudioContext;if(!AudioContext)return false;
-    if(!this.context){this.context=new AudioContext();this.master=this.context.createGain();this.master.connect(this.context.destination);}
+    if(!this.context){this.context=new AudioContext({latencyHint:'interactive'});this.master=this.context.createGain();this.master.connect(this.context.destination);this.watchContext();}
     if(this.paused&&!whilePaused)return false;
     this.master.gain.value=this.paused?0:1;
     if(this.active&&this.context.state==='running'){if(!this.paused)this.flushPending();return true;}
