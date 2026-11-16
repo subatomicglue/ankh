@@ -10,7 +10,8 @@ export class Renderer {
 
 const loadImage=src=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=reject;image.src=src;});
 const frameHeight=(actor,image)=>image.height/actor.frameCount;
-const karmaMeter=karma=>({fill:(Math.floor((karma%100)/5)+1)/20,levels:Math.min(20,Math.floor(karma/100))});
+export const karmaMeter=karma=>({fill:(Math.floor((karma%100)/5)+1)/20,levels:Math.min(20,Math.floor(karma/100))});
+export const mobileKarmaInset=(karma,portrait)=>portrait?(karmaMeter(karma).levels?4:2):0;
 
 export class CanvasRenderer extends Renderer {
   constructor(canvas,base='.') {
@@ -27,7 +28,8 @@ export class CanvasRenderer extends Renderer {
     await Promise.all([...names].map(name=>this.loadSprite(name)));
     this.worldCanvas=document.createElement('canvas');this.worldCanvas.width=WORLD.width;this.worldCanvas.height=WORLD.height;
     const context=this.worldCanvas.getContext('2d');context.imageSmoothingEnabled=false;
-    game.world.map.forEach((tile,index)=>context.drawImage(this.walls,(tile%32)*8,Math.floor(tile/32)*8,8,8,(index%192)*8,Math.floor(index/192)*8,8,8));
+    const {tileSize,mapWidth,atlasColumns}=game.world;
+    game.world.map.forEach((tile,index)=>context.drawImage(this.walls,(tile%atlasColumns)*tileSize,Math.floor(tile/atlasColumns)*tileSize,tileSize,tileSize,(index%mapWidth)*tileSize,Math.floor(index/mapWidth)*tileSize,tileSize,tileSize));
     this.resize();
   }
   async loadSprite(name) {
@@ -37,14 +39,23 @@ export class CanvasRenderer extends Renderer {
     for(let pixel=0;pixel<indexed.pixels.length;pixel++)if(indexed.pixels[pixel]===0)rgba.data[pixel*4+3]=0;
     context.putImageData(rgba,0,0);this.images.set(name,surface);
   }
+  layoutMobileViewport(karma=0) {
+    this.outputWidth=this.logicalWidth;this.portrait=this.logicalHeight-40>=this.logicalWidth;this.karmaInset=mobileKarmaInset(karma,this.portrait);
+    this.viewportY=40+this.karmaInset;this.outputHeight=this.logicalHeight-this.viewportY;
+    const aspect=this.outputWidth/this.outputHeight;
+    if(aspect<1){this.viewportWidth=192*aspect;this.viewportHeight=192;}else{this.viewportWidth=192;this.viewportHeight=192/aspect;}
+  }
+  syncMobileKarma(karma) {
+    if(!this.mobile||mobileKarmaInset(karma,this.portrait)===this.karmaInset)return;
+    this.layoutMobileViewport(karma);this.worldScale=this.outputWidth/this.viewportWidth;
+    if(this.game){this.game.camera.useGbaMode(this.viewportWidth,this.viewportHeight);this.game.camera.follow(this.game.player,this.game.cameraOffset);}
+  }
   resize() {
     this.mobile=this.mobileQuery.matches;
     if(this.mobile){
       const rect=this.canvas.parentElement.getBoundingClientRect(),ratio=rect.width&&rect.height?rect.width/rect.height:5/6;
       if(ratio<=1){this.logicalWidth=160;this.logicalHeight=Math.round(160/ratio);}else{this.logicalHeight=120;this.logicalWidth=Math.round(120*ratio);}
-      this.viewportY=40;this.outputWidth=this.logicalWidth;this.outputHeight=this.logicalHeight-40;this.portrait=this.outputHeight>=this.outputWidth;
-      const aspect=this.outputWidth/this.outputHeight;
-      if(aspect<1){this.viewportWidth=192*aspect;this.viewportHeight=192;}else{this.viewportWidth=192;this.viewportHeight=192/aspect;}
+      this.layoutMobileViewport(this.game?.karma??0);
     }else{this.logicalWidth=272;this.logicalHeight=192;this.viewportY=0;this.outputWidth=192;this.outputHeight=192;this.viewportWidth=192;this.viewportHeight=192;}
     const display=this.canvas.getBoundingClientRect(),pixelRatio=window.devicePixelRatio||1;
     this.canvas.width=Math.max(1,Math.round((display.width||this.logicalWidth)*pixelRatio));
@@ -61,15 +72,22 @@ export class CanvasRenderer extends Renderer {
   }
   worldToCanvas(x,y,camera=this.game.camera){return [(x-camera.x)*this.worldScale,(y-camera.y)*this.worldScale+this.viewportY];}
   drawActor(actor,camera) {const image=this.images.get(actor.spriteFile);if(!image)return;const height=frameHeight(actor,image),[x,y]=this.worldToCanvas(actor.x,actor.y,camera),scale=this.worldScale;this.ctx.drawImage(image,0,actor.frame*height,image.width,height,Math.round(x),Math.round(y),image.width*scale,height*scale);}
+  drawTouchShape(shape,camera,player) {
+    const image=this.images.get(shape.kind);if(!image)return;
+    let [x,y]=this.worldToCanvas(shape.x,shape.y,camera);const [playerX,playerY]=this.worldToCanvas(player.x,player.y,camera),scale=this.worldScale;
+    if(shape.kind==='touchvert')x=Math.round(playerX)+(shape.x-player.x)*scale;
+    else y=Math.round(playerY)+(shape.y-player.y)*scale;
+    this.ctx.drawImage(image,shape.kind==='touchvert'?x:Math.round(x),shape.kind==='touchhorz'?y:Math.round(y),image.width*scale,image.height*scale);
+  }
   drawWorld(game) {
     const camera=game.camera,context=this.ctx;
     context.save();context.beginPath();context.rect(0,this.viewportY,this.outputWidth,this.outputHeight);context.clip();
     context.drawImage(this.worldCanvas,camera.x,camera.y,this.viewportWidth,this.viewportHeight,0,this.viewportY,this.outputWidth,this.outputHeight);
     for(const entry of game.world.visitedRoomTiles(game.rooms)){
-      const [x,y]=this.worldToCanvas(entry.x*8,entry.y*8,camera),scale=8*this.worldScale;
-      context.drawImage(this.walls,(entry.tile%32)*8,Math.floor(entry.tile/32)*8,8,8,Math.round(x),Math.round(y),scale,scale);
+      const size=game.world.tileSize,[x,y]=this.worldToCanvas(entry.x,entry.y,camera),scale=size*this.worldScale,columns=game.world.atlasColumns;
+      context.drawImage(this.walls,(entry.tile%columns)*size,Math.floor(entry.tile/columns)*size,size,size,Math.round(x),Math.round(y),scale,scale);
     }
-    for(const shape of game.touches.shapes){const image=this.images.get(shape.kind),[x,y]=this.worldToCanvas(shape.x,shape.y,camera);context.drawImage(image,Math.round(x),Math.round(y),image.width*this.worldScale,image.height*this.worldScale);}
+    for(const shape of game.touches.shapes)this.drawTouchShape(shape,camera,game.player);
     const bullet=this.images.get('bullet');game.shots.shots.forEach(shot=>{const [x,y]=this.worldToCanvas(shot.x,shot.y,camera);context.drawImage(bullet,Math.round(x),Math.round(y),bullet.width*this.worldScale,bullet.height*this.worldScale);});
     game.actors.filter(actor=>actor.enabled&&actor.visible&&actor.has('ACTOR_VISIBLE')&&actor.worldSpace&&game.onScreen(actor)).sort((a,b)=>b.depth-a.depth).forEach(actor=>this.drawActor(actor,camera));
     context.restore();
@@ -79,30 +97,33 @@ export class CanvasRenderer extends Renderer {
     boxes.forEach(box=>context.strokeRect(...box));
     game.inventory.slots.forEach((item,index)=>{if(item)this.drawSprite(item.actor,...positions[index]);});
   }
+  drawDebugLabel(game) {
+    if(!game.debugFlyover)return;
+    const context=this.ctx,label='DEBUG';context.save();context.font='bold 6px ui-monospace, monospace';context.textBaseline='top';const width=Math.ceil(context.measureText(label).width);context.fillStyle='#050508cc';context.fillRect(2,this.viewportY+3,width+4,9);context.fillStyle='#fe02fe';context.fillText(label,4,this.viewportY+4);context.restore();
+  }
   drawMobileHud(game) {
     const context=this.ctx,cell=this.logicalWidth/4,positions=[],boxes=[];context.fillStyle='#050508';context.fillRect(0,0,this.logicalWidth,40);
     for(let index=0;index<4;index++){const left=index*cell;positions.push([left+(cell-32)/2,1]);boxes.push([left+3,1,cell-6,28]);}
     this.drawInventory(game,positions,boxes);
-    this.hudText.printPixels(3,31,'ROOMS');this.hudText.printnumPixels(47,31,String(game.rooms.size).padStart(2,'0'));
-    this.hudText.printPixels(67,31,'OBJECTS');this.hudText.printnumPixels(127,31,String(game.objects).padStart(4,'0'));
+    if(game.paused)this.hudText.printPixels(Math.round((this.logicalWidth-128)/2),31,'UNIVERSE ON HOLD');
+    else{this.hudText.printPixels(3,31,'ROOMS');this.hudText.printnumPixels(47,31,String(game.rooms.size).padStart(2,'0'));this.hudText.printPixels(67,31,'OBJECTS');this.hudText.printnumPixels(127,31,String(game.objects).padStart(4,'0'));}
     context.fillStyle='#fe02fe';const meter=karmaMeter(game.karma);
     if(this.portrait){context.fillRect(0,40,this.outputWidth*meter.fill,2);for(let level=0;level<meter.levels;level++)context.fillRect(level*3,42,2,2);}
     else{context.fillRect(this.outputWidth-2,40+this.outputHeight*(1-meter.fill),2,this.outputHeight*meter.fill);for(let level=0;level<meter.levels;level++)context.fillRect(this.outputWidth-4,40+level*3,2,2);}
-    if(game.paused){const x=Math.round((this.outputWidth-64)/2),y=Math.round(this.viewportY+(this.outputHeight-16)/2);this.hudText.printPixels(x,y,'UNIVERSE');this.hudText.printPixels(x,y+8,' ON HOLD');}
   }
   drawDesktopHud(game) {
     const context=this.ctx;context.fillStyle='#050508';context.fillRect(192,0,80,192);
     this.drawInventory(game,[[216,8],[245,8],[216,37],[245,37]],[[212,4,25,25],[241,4,25,25],[212,33,25,25],[241,33,25,25]]);
     this.hudText.print(26,9,'ROOMS\n\nOBJECTS');this.hudText.printnum(26,10,`${String(game.rooms.size).padStart(2,'0')}\n\n${String(game.objects).padStart(4,'0')}`);
     const meter=karmaMeter(game.karma);context.fillStyle='#fe02fe';context.fillRect(192,192-192*meter.fill,2,192*meter.fill);for(let level=0;level<meter.levels;level++)context.fillRect(194,level*8,2,6);
-    if(game.paused){this.hudText.print(26,18,'UNIVERSE');this.hudText.print(26,19,' ON HOLD');}
-    else if(game.debugFlyover){this.hudText.print(26,18,' DEBUG  ');this.hudText.print(26,19,' MODE   ');}
+    if(game.paused){this.hudText.print(26,22,'UNIVERSE');this.hudText.print(26,23,' ON HOLD');}
   }
   render(game) {
     if(this.mobile!==this.mobileQuery.matches)this.resize();
+    this.syncMobileKarma(game.karma);
     const context=this.ctx;context.clearRect(0,0,this.logicalWidth,this.logicalHeight);
     if(game.phase==='intro'){const title=this.titles[game.titleIndex];if(this.mobile){const scale=Math.min(this.logicalWidth/240,this.logicalHeight/160),width=240*scale,height=160*scale;context.drawImage(title,0,0,240,160,(this.logicalWidth-width)/2,(this.logicalHeight-height)/2,width,height);}else context.drawImage(title,0,0,240,160,16,16,240,160);return;}
-    this.drawWorld(game);this.mobile?this.drawMobileHud(game):this.drawDesktopHud(game);
+    this.drawWorld(game);this.mobile?this.drawMobileHud(game):this.drawDesktopHud(game);this.drawDebugLabel(game);
   }
   destroy(){this.resizeObserver.disconnect();this.mobileQuery.removeEventListener('change',this.onLayoutChange);window.removeEventListener('resize',this.onLayoutChange);window.visualViewport?.removeEventListener('resize',this.onLayoutChange);}
 }

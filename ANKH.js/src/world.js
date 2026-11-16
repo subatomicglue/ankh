@@ -1,19 +1,20 @@
 import { WALL_TILES, WORLD } from './data.js';
 
-const PASSABLE_TILES = new Set([346,347,348,349,378,379,380,381]);
+const PASSABLE_TILES = new Set([93,94]);
 // grit remaps the GBA's transparent wall color (raw index 200) to BMP index 255.
 const WALL_VOID_PIXEL = 255;
 
 export class World {
-  constructor() { this.map = WALL_TILES; this.width = WORLD.width; this.height = WORLD.height; this.atlas=null; }
+  constructor() { this.map=WALL_TILES;Object.assign(this,WORLD);this.atlas=null; }
   tileAt(x, y) {
-    const tx = Math.floor(x / 8), ty = Math.floor(y / 8);
-    if (tx < 0 || ty < 0 || tx >= 192 || ty >= 192) return -1;
-    return this.map[ty * 192 + tx];
+    const tx=Math.floor(x/this.tileSize),ty=Math.floor(y/this.tileSize);
+    if(tx<0||ty<0||tx>=this.mapWidth||ty>=this.mapHeight)return -1;
+    return this.map[ty*this.mapWidth+tx];
   }
   pixelAt(x,y) {
     const tile=this.tileAt(x,y); if(tile<0||!this.atlas)return 0;
-    return this.atlas.pixel((tile%32)*8+(Math.floor(x)%8+8)%8,Math.floor(tile/32)*8+(Math.floor(y)%8+8)%8);
+    const localX=(Math.floor(x)%this.tileSize+this.tileSize)%this.tileSize,localY=(Math.floor(y)%this.tileSize+this.tileSize)%this.tileSize;
+    return this.atlas.pixel((tile%this.atlasColumns)*this.tileSize+localX,Math.floor(tile/this.atlasColumns)*this.tileSize+localY);
   }
   isSolidPixel(x,y) {
     return !PASSABLE_TILES.has(this.tileAt(x,y))&&this.pixelAt(x,y)!==WALL_VOID_PIXEL;
@@ -34,15 +35,14 @@ export class World {
   }
 
   // GBA Background::update() displays the visited-room bitfield in room 1,2.
-  // Each visited room contributes its upper-left 2x2 world tiles to this 16x16 map.
+  // Each visited room contributes its upper-left 16x16 world tile to the map display.
   *visitedRoomTiles(rooms) {
     for (const room of rooms) {
       const [roomX,roomY]=room.split(',').map(Number);
-      if(roomX<0||roomX>=8||roomY<0||roomY>=8)continue;
-      for(let y=0;y<2;y++)for(let x=0;x<2;x++){
-        const sourceX=roomX*24+x,sourceY=roomY*24+y;
-        yield {x:27+roomX*2+x,y:51+roomY*2+y,tile:this.map[sourceX+sourceY*192]};
-      }
+      const roomsWide=Math.floor(this.width/this.roomWidth),roomsHigh=Math.floor(this.height/this.roomHeight);
+      if(roomX<0||roomX>=roomsWide||roomY<0||roomY>=roomsHigh)continue;
+      const sourceX=roomX*(this.roomWidth/this.tileSize),sourceY=roomY*(this.roomHeight/this.tileSize);
+      yield {x:216+roomX*this.tileSize,y:408+roomY*this.tileSize,tile:this.map[sourceX+sourceY*this.mapWidth]};
     }
   }
 }

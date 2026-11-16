@@ -15,13 +15,12 @@
       <button type="button" data-mode="stop">STOP</button>
     </nav>
     <section class="mobile-settings" role="dialog" aria-modal="true" aria-label="Mobile settings" hidden>
-      <h2>SETTINGS</h2>
-      <p>CONE ORIGIN</p>
-      <div><button type="button" data-cone-mode="follow">FOLLOW</button><button type="button" data-cone-mode="stay">STAY</button></div>
-      <p>REACTION LAG</p>
-      <div><button type="button" data-reaction-lag="on">ON</button><button type="button" data-reaction-lag="off">OFF</button></div>
-      <button type="button" data-settings-close>DONE</button>
-      <small>Open with two fingers on the score text.</small>
+      <div class="settings-panel">
+        <h2>SETTINGS</h2>
+        <button type="button" data-reaction-lag>REACTION LAG</button>
+        <button type="button" data-debug-mode>DEBUG MODE</button>
+        <small>Tap outside to close · Tap score: pause · Hold multitouch: debug</small>
+      </div>
     </section>
     <section class="controls">
       <div><h2>Move</h2><p><kbd>I</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd></p><small><b>Run</b> · <b>Step</b> (Ctrl/Shft) · <b>Stop</b> (Space)</small></div>

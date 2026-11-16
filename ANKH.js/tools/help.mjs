@@ -28,7 +28,7 @@ Debug flyover:
 Mobile controls:
   Press a 90° cone       Run in that direction; drag to steer
   Stop                   Same spot, opposite cone, or STOP pad
-  Cone mode              follow (default); ?cones=stay to pin
+  Cone origin            follows Other
   Inventory cells        Tap to drop that item
   Settings               Two-finger touch on score text
   Hold STEP + tap        Take one careful step
@@ -37,8 +37,8 @@ Mobile controls:
 
 Development:
   npm test           Run engine tests
-  npm run audit      Verify generated map/actors and engine tests against GBA
-  npm run generate  Regenerate data from the GBA source
+  npm run audit      Verify generated ANKH.js data and engine tests
+  npm run generate  Build src/data.js from data/*.json
   npm run help       Show this help
   npm run start-debug  Start HTTPS plus the isolated debug Chrome profile
 `);

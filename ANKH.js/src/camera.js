@@ -1,10 +1,12 @@
+import { WORLD } from './data.js';
+
 export class Camera {
-  constructor(){this.reset();}
-  reset(){this.mode='room';this.viewportWidth=192;this.viewportHeight=192;this.resetPosition();}
+  constructor(world=WORLD){this.world=world;this.reset();}
+  reset(){this.mode='room';this.viewportWidth=this.world.roomWidth;this.viewportHeight=this.world.roomHeight;this.resetPosition();}
   resetPosition(){this.x=0;this.y=0;this.freeX=0;this.freeY=0;}
-  follow(player,offset=[0,0]){if(this.mode==='free'){this.x=this.freeX;this.y=this.freeY;return;}const [px,py]=player.center,roomX=Math.floor(px/192)*192,roomY=Math.floor(py/192)*192;if(this.mode==='gba'){const rangeX=192-this.viewportWidth,rangeY=192-this.viewportHeight,localX=px-roomX,localY=py-roomY;this.x=Math.max(0,Math.min(1536-this.viewportWidth,roomX+Math.trunc(localX*rangeX/192)+offset[0]));this.y=Math.max(0,Math.min(1536-this.viewportHeight,roomY+Math.trunc(localY*rangeY/192)+offset[1]));return;}this.x=Math.max(0,Math.min(1344,roomX+offset[0]));this.y=Math.max(0,Math.min(1344,roomY+offset[1]));}
-  useRoomMode(){this.mode='room';this.viewportWidth=192;this.viewportHeight=192;}
+  follow(player,offset=[0,0]){if(this.mode==='free'){this.x=this.freeX;this.y=this.freeY;return;}const {width,height,roomWidth,roomHeight}=this.world,[px,py]=player.center,roomX=Math.floor(px/roomWidth)*roomWidth,roomY=Math.floor(py/roomHeight)*roomHeight;if(this.mode==='gba'){const rangeX=roomWidth-this.viewportWidth,rangeY=roomHeight-this.viewportHeight,localX=px-roomX,localY=py-roomY;this.x=Math.max(0,Math.min(width-this.viewportWidth,roomX+Math.trunc(localX*rangeX/roomWidth)+offset[0]));this.y=Math.max(0,Math.min(height-this.viewportHeight,roomY+Math.trunc(localY*rangeY/roomHeight)+offset[1]));return;}this.x=Math.max(0,Math.min(width-roomWidth,roomX+offset[0]));this.y=Math.max(0,Math.min(height-roomHeight,roomY+offset[1]));}
+  useRoomMode(){this.mode='room';this.viewportWidth=this.world.roomWidth;this.viewportHeight=this.world.roomHeight;}
   useGbaMode(width=160,height=160){this.mode='gba';this.viewportWidth=width;this.viewportHeight=height;}
   useFreeMode(x=this.x,y=this.y){this.mode='free';this.setFreePosition(x,y);}
-  setFreePosition(x,y){this.freeX=Math.max(0,Math.min(1344,x));this.freeY=Math.max(0,Math.min(1344,y));if(this.mode==='free'){this.x=this.freeX;this.y=this.freeY;}}
+  setFreePosition(x,y){this.freeX=Math.max(0,Math.min(this.world.width-this.world.roomWidth,x));this.freeY=Math.max(0,Math.min(this.world.height-this.world.roomHeight,y));if(this.mode==='free'){this.x=this.freeX;this.y=this.freeY;}}
 }

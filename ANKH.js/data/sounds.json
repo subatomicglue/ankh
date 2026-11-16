@@ -1,0 +1,18 @@
+[
+  {"id":"tone1","src":"assets/sounds/ankh-tone1.m4a","next_src":"fwd","loop":"once_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"tone2","src":"assets/sounds/ankh-tone2.m4a","next_src":"fwd","loop":"once_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"tone3","src":"assets/sounds/ankh-tone3.m4a","next_src":"fwd","loop":"once_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"tone4","src":"assets/sounds/ankh-tone4.m4a","next_src":"fwd","loop":"once_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"death","src":"assets/sounds/ankh-death.m4a","next_src":"fwd","loop":"once_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"resurrection","src":"assets/sounds/ankh-ressurection.m4a","next_src":"fwd","loop":"once_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"unknown","src":"assets/sounds/ankh-unknown.m4a","next_src":"fwd","loop":"once_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"doormove","src":["assets/sounds/ankh-doormove.m4a","assets/sounds/ankh-doormove2.m4a","assets/sounds/ankh-doormove3.m4a"],"next_src":"rnd","loop":"once_fwd","polyphony":3,"positional":false,"vol":1},
+  {"id":"lock","src":["assets/sounds/ankh-lock.m4a","assets/sounds/ankh-lock2.m4a","assets/sounds/ankh-lock3.m4a"],"next_src":"rnd","loop":"once_fwd","polyphony":3,"positional":false,"vol":1},
+  {"id":"movement","src":["assets/sounds/ankh-movement1.m4a","assets/sounds/ankh-movement2.m4a"],"next_src":"rnd","loop":"repeat_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"step","src":["assets/sounds/ankh-step1.m4a","assets/sounds/ankh-step2.m4a","assets/sounds/ankh-step3.m4a","assets/sounds/ankh-step4.m4a","assets/sounds/ankh-step5.m4a","assets/sounds/ankh-step6.m4a","assets/sounds/ankh-step7.m4a","assets/sounds/ankh-step8.m4a","assets/sounds/ankh-step9.m4a","assets/sounds/ankh-step10.m4a","assets/sounds/ankh-step11.m4a","assets/sounds/ankh-step12.m4a","assets/sounds/ankh-step13.m4a","assets/sounds/ankh-step14.m4a"],"next_src":"rnd","loop":"once_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"shot","src":["assets/sounds/ankh-shot1.m4a","assets/sounds/ankh-shot2.m4a"],"next_src":"rnd","loop":"once_fwd","polyphony":4,"positional":false,"vol":1},
+  {"id":"song1","src":"assets/sounds/ankh-song1.m4a","next_src":"fwd","loop":"repeat_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"song2","src":"assets/sounds/ankh-song2.m4a","next_src":"fwd","loop":"repeat_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"song3","src":"assets/sounds/ankh-song3.m4a","next_src":"fwd","loop":"repeat_fwd","polyphony":1,"positional":false,"vol":1},
+  {"id":"song4","src":"assets/sounds/ankh-song4.m4a","next_src":"fwd","loop":"repeat_fwd","polyphony":1,"positional":false,"vol":1}
+]

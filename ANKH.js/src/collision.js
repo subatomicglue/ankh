@@ -9,7 +9,7 @@ export class CollisionSystem {
     const l=Math.max(Math.floor(a.x),Math.floor(b.x)),t=Math.max(Math.floor(a.y),Math.floor(b.y)),r=Math.min(Math.floor(a.x+a.width),Math.floor(b.x+b.width)),bt=Math.min(Math.floor(a.y+a.height),Math.floor(b.y+b.height));if(l>r||t>bt)return false;
     for(let y=t;y<=bt;y++)for(let x=l;x<=r;x++){const ap=this.actorPixel(a,x-Math.floor(a.x),y-Math.floor(a.y)),bp=this.actorPixel(b,x-Math.floor(b.x),y-Math.floor(b.y));if(ap&&bp)return true;}return false;
   }
-  actorActors(actor,exclude=null){return this.getActors().some(other=>other!==actor&&other!==exclude&&other.enabled&&other.visible&&other.worldSpace&&other.wasOnScreen&&other.has('ACTOR_COLLISION_PHYSICS')&&this.actorsOverlap(actor,other));}
+  actorActors(actor,exclude=null){return this.getActors().some(other=>other!==actor&&other!==exclude&&other.enabled&&other.visible&&other.worldSpace&&this.isOnScreen(other)&&other.has('ACTOR_COLLISION_PHYSICS')&&this.actorsOverlap(actor,other));}
   actor(actor,exclude=null,direction=null){return this.actorWorld(actor,direction)||this.actorActors(actor,exclude);}
   move(actor,dx,dy,exclude=null,tolerateThin=false) {
     const steps=Math.max(Math.abs(dx),Math.abs(dy));

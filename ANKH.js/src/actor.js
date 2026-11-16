@@ -3,6 +3,7 @@ export const Flags = { VISIBLE: 1, COLLISION: 2, TRIGGER: 4, PHYSICS: 8, PICKUP:
 export class Actor {
   constructor(definition, behavior) {
     Object.assign(this, definition);
+    this.behaviorSpec = definition.behavior;
     this.startX = this.x; this.startY = this.y;
     this.behavior = behavior;
     this.width = definition.box[0]; this.height = definition.box[1];
