@@ -13,6 +13,7 @@ const soundDefinitions=await fetch('./data/sounds.json').then(response=>{if(!res
 const spriteNames=['badguy','benign','bonus','box','bullet','chalice','crown','flit','horzdoor','illumina','item','key','lock','lockface','locklisten','musicbox','nobitmap','other','suck','tele','touchhorz','touchvert','trap','treasure','vertdoor'];
 await assets.load(spriteNames);
 let game;const soundManager=new SoundManager({onBackground:()=>{if(game?.phase==='game'&&!game.paused)game.applyCommand({type:'pause'});}}).configure(soundDefinitions);game=new Game(input,assets,soundManager);soundManager.setListener(()=>game.player.center);
+soundManager.bindUnlock(document.querySelector('#audio-unlock'));
 const renderer=new CanvasRenderer(canvas,'.');await renderer.load(game);status.textContent='';
 const actionButtons=document.querySelectorAll('.mobile-actions button'),padKeys={step:'Z',shoot:'X',touch:'C',stop:'V / SPACE'};actionButtons.forEach(button=>{renderer.hudText.label(button,button.textContent.trim());const tip=document.createElement('span');tip.className='key-tip';tip.textContent=padKeys[button.dataset.mode];tip.setAttribute('aria-hidden','true');button.append(tip);});
 const browserControls=new BrowserControls(canvas,actionButtons,input,game,renderer,document.querySelector('.mobile-settings'),soundManager);

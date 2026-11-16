@@ -16,7 +16,7 @@ export class Game {
     this.actorById=new Map(this.actors.map(a=>[a.id,a]));this.player=this.actorById.get('player');
     this.camera=new Camera(this.world);this.collision=new CollisionSystem(this.world,this.assets,()=>this.actors,a=>this.onScreen(a));
     this.actorManager=new ActorManager(this.actors,this.player,actor=>this.onScreen(actor));
-    this.inventory=new Inventory(this);this.shots=new ShotManager(this);this.touches=new TouchManager(this);this.phase='intro';this.titleIndex=0;this.titleTicks=0;this.reset(false);
+    this.inventory=new Inventory(this);this.shots=new ShotManager(this);this.touches=new TouchManager(this);this.phase='intro';this.titleIndex=0;this.titleTicks=0;this.reset(false);this.sound('titlesong');
   }
   sound(id,options){return this.sounds?.play(id,options);}
   reset(playSpawnSound=true) {
@@ -24,6 +24,7 @@ export class Game {
     this.actors.forEach(a=>a.reset());this.actors.filter(a=>a.type==='treasure'||a.type==='none').forEach(a=>a.visible=false);
     this.player.visible=true;this.player.enabled=true;this.velocity=[0,0];this.camera.resetPosition();this.karma=15;this.objects=1;this.rooms=new Set();this.paused=false;this.debugFlyover=false;this.debugResetPosition=null;this.touchSlot=0;
     this.inventory.slots.fill(null);this.shots.shots=[];this.touches.reset();this.cameraOffset=[0,0];this.rumbleCounter=0;this.extraTouch=0;this.slow=false;this.slowTick=0;this.lastRoom=null;
+    if(this.phase==='game')this.sound('ambient');
     if(playSpawnSound)this.sound('resurrection');
   }
   actorOverlaps(a,b) { return this.collision.actorsOverlap(a,b); }
@@ -62,7 +63,7 @@ export class Game {
   }
   applyCommands(commands){let gameplayBlocked=this.paused;for(const command of commands){const allowed=['pause','reset','debug-flyover'].includes(command.type);if(gameplayBlocked&&!allowed)continue;this.applyCommand(command);if(this.paused)gameplayBlocked=true;}}
   update() {
-    if(this.phase==='intro'){const commands=this.input.drain();if(commands.some(command=>command.type==='start'||command.type==='stop')){this.phase='game';this.sounds?.unpause?.();this.sound('resurrection');}else if(++this.titleTicks%180===0)this.titleIndex=(this.titleIndex+1)%9;return;}
+    if(this.phase==='intro'){const commands=this.input.drain();if(commands.some(command=>command.type==='start'||command.type==='stop')){this.phase='game';this.sounds?.stop?.('titlesong');this.sounds?.unpause?.();this.sound('ambient');this.sound('resurrection');}else if(++this.titleTicks%180===0)this.titleIndex=(this.titleIndex+1)%9;return;}
     if(this.paused){this.applyCommands(this.input.drain());if(this.paused)return;}
     if(this.slow){if(++this.slowTick<3)return;this.slowTick=0;}else this.slowTick=0;
     this.applyCommands(this.input.drain());if(this.paused)return;

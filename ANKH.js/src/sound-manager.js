@@ -6,7 +6,7 @@ const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 export class SoundManager {
   constructor({onBackground=()=>{},windowTarget=globalThis,documentTarget=globalThis.document}={}) {
     this.window=windowTarget;this.document=documentTarget;this.onBackground=onBackground;
-    this.context=null;this.master=null;this.slots=new Map();this.buffers=new Map();this.loading=new Map();this.playing=new Set();this.listener=()=>null;this.active=false;this.paused=false;this.destroyed=false;
+    this.context=null;this.master=null;this.slots=new Map();this.buffers=new Map();this.loading=new Map();this.playing=new Set();this.pending=[];this.listener=()=>null;this.active=false;this.paused=false;this.destroyed=false;this.unlockElement=null;this.unlockClick=null;
     this.onBlur=()=>this.background();this.onVisibility=()=>{if(this.document?.hidden)this.background();};this.onPageHide=()=>this.background();
     this.window?.addEventListener?.('blur',this.onBlur);this.window?.addEventListener?.('pagehide',this.onPageHide);this.document?.addEventListener?.('visibilitychange',this.onVisibility);
   }
@@ -20,29 +20,38 @@ export class SoundManager {
       if(!NEXT_MODES.has(next))throw new Error(`Unknown next_src for ${definition.id}: ${next}`);
       if(!LOOP_MODES.has(loop))throw new Error(`Unknown loop for ${definition.id}: ${loop}`);
       if(this.slots.has(definition.id))throw new Error(`Duplicate sound slot: ${definition.id}`);
-      this.slots.set(definition.id,{id:definition.id,sources,next,loop,polyphony:Math.max(1,Math.trunc(definition.polyphony??1)),positional:Boolean(definition.positional),volume:clamp(Number(definition.vol??1),0,1),cursor:next==='back'?sources.length-1:0,generation:0,voices:[]});
+      const volume=Number(definition.vol??1);
+      this.slots.set(definition.id,{id:definition.id,sources,next,loop,polyphony:Math.max(1,Math.trunc(definition.polyphony??1)),positional:Boolean(definition.positional),volume:Number.isFinite(volume)?Math.max(0,volume):1,cursor:next==='back'?sources.length-1:0,generation:0,voices:[]});
     }
     return this;
   }
 
   setListener(provider){this.listener=typeof provider==='function'?provider:()=>provider;return this;}
+  bindUnlock(element,onUnlock=()=>{}){if(this.unlockElement&&this.unlockClick)this.unlockElement.removeEventListener('click',this.unlockClick);this.unlockElement=element;this.unlockClick=async event=>{event.preventDefault();try{if(await this.wake()){element.hidden=true;onUnlock();}}catch(error){console.warn('Audio initialization failed',error);}};element?.addEventListener?.('click',this.unlockClick);if(element)element.hidden=this.active;return this;}
   setPolyphony(id,count){const slot=this.slots.get(id);if(!slot)return false;slot.polyphony=Math.max(1,Math.trunc(count));while(slot.voices.length>slot.polyphony)this.stopVoice(slot.voices[0]);return true;}
 
-  async init() {
+  primeContext(){const source=this.context.createBufferSource();source.buffer=this.context.createBuffer(1,1,this.context.sampleRate);source.connect(this.master);source.start(0);}
+
+  async activate(whilePaused=false) {
     if(this.destroyed)return false;
     const AudioContext=this.window.AudioContext??this.window.webkitAudioContext;if(!AudioContext)return false;
     if(!this.context){this.context=new AudioContext();this.master=this.context.createGain();this.master.connect(this.context.destination);}
-    if(this.paused)return false;
-    if(this.active&&this.context.state==='running')return true;
-    if(this.context.state!=='running')await this.context.resume();
+    if(this.paused&&!whilePaused)return false;
+    this.master.gain.value=this.paused?0:1;
+    if(this.active&&this.context.state==='running'){if(!this.paused)this.flushPending();return true;}
+    this.primeContext();
+    const resumed=this.context.state==='running'?null:this.context.resume();
+    if(resumed)await resumed;
     if(this.context.state!=='running'){this.active=false;return false;}
-    const source=this.context.createBufferSource();source.buffer=this.context.createBuffer(1,1,this.context.sampleRate);source.connect(this.master);source.start(0);
-    this.active=true;this.claimMediaSession();this.preload();return true;
+    this.active=true;if(this.unlockElement)this.unlockElement.hidden=true;this.claimMediaSession();if(this.paused){const session=this.window.navigator?.mediaSession;if(session)session.playbackState='paused';}else this.flushPending();this.preload();return true;
   }
+  init(){return this.activate(false);}
+  wake(){return this.activate(true);}
 
   pause() {
     if(this.destroyed||this.paused)return false;
     this.paused=true;
+    if(this.master)this.master.gain.value=0;
     const session=this.window.navigator?.mediaSession;if(session)session.playbackState='paused';
     this.context?.suspend?.().catch?.(()=>{});return true;
   }
@@ -50,7 +59,8 @@ export class SoundManager {
   unpause() {
     if(this.destroyed||!this.paused)return false;
     this.paused=false;
-    this.context?.resume?.().then?.(()=>{if(this.active)this.claimMediaSession();}).catch?.(()=>{});return true;
+    if(this.master)this.master.gain.value=1;
+    const resumed=this.context?.state==='running'?Promise.resolve():this.context?.resume?.();resumed?.then?.(()=>{if(this.active)this.claimMediaSession();this.flushPending();}).catch?.(()=>{});return true;
   }
 
   preload(){return Promise.allSettled([...this.slots.values()].flatMap(slot=>slot.sources.map(source=>this.loadBuffer(source))));}
@@ -78,14 +88,18 @@ export class SoundManager {
 
   play(id,{position=null,volume=1,rate=1}={}) {
     const slot=this.slots.get(id);if(!slot)return null;
-    const generation=slot.generation,handle={voice:null,stopped:false,stop:()=>{handle.stopped=true;if(handle.voice){this.stopVoice(handle.voice);handle.voice=null;}}};
-    handle.ready=(async()=>{if(!this.active||this.context?.state!=='running'){const ready=await this.init();if(!ready)return null;}if(handle.stopped||slot.generation!==generation)return null;const url=this.sourceFor(slot),backward=slot.loop.endsWith('_bck'),buffer=await this.loadBuffer(url);if(handle.stopped||slot.generation!==generation)return null;handle.voice=this.startVoice(slot,backward?this.reversed(buffer):buffer,{position,volume,rate});return handle.voice;})().catch(error=>{console.warn(`Unable to play sound ${id}`,error);return null;});
+    let finish;const handle={slot,generation:slot.generation,options:{position,volume,rate},voice:null,queued:false,stopped:false,ready:new Promise(resolve=>finish=resolve),finish,stop:()=>{if(handle.stopped)return;handle.stopped=true;if(handle.queued)this.pending=this.pending.filter(candidate=>candidate!==handle);if(handle.voice){this.stopVoice(handle.voice);handle.voice=null;}handle.finish(null);}};
+    if(this.active&&!this.paused&&this.context?.state==='running')this.startHandle(handle);else this.queueHandle(handle);
     return handle;
   }
 
+  queueHandle(handle){if(!handle.queued&&!handle.stopped){handle.queued=true;this.pending.push(handle);}}
+  flushPending(){if(!this.active||this.paused||this.context?.state!=='running')return;const pending=this.pending;this.pending=[];for(const handle of pending){handle.queued=false;this.startHandle(handle);}}
+  async startHandle(handle){if(handle.stopped||handle.slot.generation!==handle.generation){handle.finish(null);return;}try{const url=this.sourceFor(handle.slot),backward=handle.slot.loop.endsWith('_bck'),buffer=await this.loadBuffer(url);if(handle.stopped||handle.slot.generation!==handle.generation){handle.finish(null);return;}handle.voice=this.startVoice(handle.slot,backward?this.reversed(buffer):buffer,handle.options);handle.finish(handle.voice);}catch(error){console.warn(`Unable to play sound ${handle.slot.id}`,error);handle.finish(null);}}
+
   startVoice(slot,buffer,{position,volume,rate}) {
     while(slot.voices.length>=slot.polyphony)this.stopVoice(slot.voices[0]);
-    const source=this.context.createBufferSource(),gain=this.context.createGain(),voice={slot,source,gain,position,volume:clamp(slot.volume*Number(volume),0,1)};
+    const source=this.context.createBufferSource(),gain=this.context.createGain(),requestedVolume=Number(volume),voice={slot,source,gain,position,volume:slot.volume*(Number.isFinite(requestedVolume)?Math.max(0,requestedVolume):1)};
     source.buffer=buffer;source.loop=slot.loop.startsWith('repeat_');source.playbackRate.value=rate;source.connect(gain).connect(this.master);slot.voices.push(voice);this.playing.add(voice);source.addEventListener('ended',()=>this.removeVoice(voice),{once:true});this.updateVoice(voice);source.start();return voice;
   }
 
@@ -93,11 +107,11 @@ export class SoundManager {
   update(){for(const voice of this.playing)this.updateVoice(voice);}
   removeVoice(voice){this.playing.delete(voice);const index=voice.slot.voices.indexOf(voice);if(index>=0)voice.slot.voices.splice(index,1);}
   stopVoice(voice){try{voice.source.stop();}catch{}this.removeVoice(voice);}
-  stop(id){const slot=this.slots.get(id);if(slot){slot.generation++;for(const voice of [...slot.voices])this.stopVoice(voice);}}
+  stop(id){const slot=this.slots.get(id);if(slot){slot.generation++;for(const voice of [...slot.voices])this.stopVoice(voice);for(const handle of this.pending)if(handle.slot===slot){handle.stopped=true;handle.finish(null);}this.pending=this.pending.filter(handle=>handle.slot!==slot);}}
   stopAll(){for(const slot of this.slots.values())this.stop(slot.id);}
 
   claimMediaSession(){const session=this.window.navigator?.mediaSession;if(!session)return;const actions={play:()=>this.init(),pause:()=>this.background(),stop:()=>this.background()};for(const action of MEDIA_SESSION_ACTIONS){try{session.setActionHandler(action,actions[action]??null);}catch{}}if(this.window.MediaMetadata)session.metadata=new this.window.MediaMetadata({title:'ANKH',artist:'David Van Brink'});session.playbackState='playing';}
   releaseMediaSession(){const session=this.window.navigator?.mediaSession;if(!session)return;for(const action of MEDIA_SESSION_ACTIONS){try{session.setActionHandler(action,null);}catch{}}session.metadata=null;session.playbackState='none';try{session.setPositionState();}catch{}}
   background(){if(this.destroyed)return;this.onBackground();this.pause();}
-  destroy(){if(this.destroyed)return;this.destroyed=true;this.stopAll();this.active=false;this.paused=false;this.releaseMediaSession();this.window?.removeEventListener?.('blur',this.onBlur);this.window?.removeEventListener?.('pagehide',this.onPageHide);this.document?.removeEventListener?.('visibilitychange',this.onVisibility);this.context?.close?.().catch?.(()=>{});this.context=null;this.master=null;this.slots.clear();this.buffers.clear();this.loading.clear();}
+  destroy(){if(this.destroyed)return;this.destroyed=true;this.stopAll();this.pending=[];this.active=false;this.paused=false;this.releaseMediaSession();this.window?.removeEventListener?.('blur',this.onBlur);this.window?.removeEventListener?.('pagehide',this.onPageHide);this.document?.removeEventListener?.('visibilitychange',this.onVisibility);if(this.unlockElement&&this.unlockClick)this.unlockElement.removeEventListener('click',this.unlockClick);this.unlockElement=null;this.unlockClick=null;this.context?.close?.().catch?.(()=>{});this.context=null;this.master=null;this.slots.clear();this.buffers.clear();this.loading.clear();}
 }

@@ -38,7 +38,7 @@ export class BrowserControls {
     this.installSettings();
   }
 
-  activateAudio(){this.soundManager?.init().catch(error=>console.warn('Audio initialization failed',error));}
+  activateAudio(){this.soundManager?.wake().catch(error=>console.warn('Audio initialization failed',error));}
   unknownInput(event){const key=event.key?.toLowerCase();if(['shift','control','alt','meta'].includes(key)||(this.renderer.mobile&&this.keyboardPads.has(key)))return;this.soundManager?.play('unknown');}
 
   installButtons(buttons) {
